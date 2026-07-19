@@ -45,14 +45,13 @@ but in redis all server count is store in redis cache so every server get same c
 
 */}
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 //code of redis rate limit ok
 
 import rateLimit from "express-rate-limit"; //middleware limit API request
 import { RedisStore } from "rate-limit-redis"; //store rate limit data inside redis instead of node memory
-
 import redis from "../config/redis.js"; //redis client connection
-
 
 
 // reusable Redis Store
@@ -62,6 +61,10 @@ const createStore = (prefix) =>
         prefix, //keeps different limiters like login signup separeated in redis
     });
 
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+//Auth API limiter
 
 
 // ==============================
@@ -95,11 +98,6 @@ export const loginLimiter = rateLimit({
 
 
 });
-
-
-
-
-
 
 
 
@@ -176,7 +174,7 @@ export const verifyOtpLimiter = rateLimit({
 
 export const forgotPasswordLimiter = rateLimit({
 
-    store:  createStore("forgotPassword:"),
+    store: createStore("forgotPassword:"),
     windowMs: 15 * 60 * 1000,
     max: 3,
     standardHeaders: true,
@@ -249,8 +247,36 @@ export const apiLimiter = rateLimit({
 
 
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+// Business API Limiter
+// Create/Update/Delete Business
 
 
+//Create Business API Limiter
+
+export const businessLimiter = rateLimit({
+
+    store: createStore("business:"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 100,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: {
+
+        success: false,
+
+        message:
+            "Too many requests. Please try again later.",
+
+    },
+
+
+});
 
 
 

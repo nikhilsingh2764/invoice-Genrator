@@ -19,7 +19,7 @@ Content-Type: application/json
 
 {
     "email": "nikhilsinghdfg@gmail.com",
-    "otp": "905854"
+    "otp": "751441"
 
 }
 
@@ -117,3 +117,61 @@ Content-Type: application/json
     "otp": "406966",
     "newPassword": "dhn245dfgA@"
 }
+
+
+
+### create new business
+
+
+POST http://localhost:6000/api/v1/business
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NDUzOTQwLCJleHAiOjE3ODQ0NTQ4NDB9.7GZW4uIlIwncCjIV-xz-Fbi5KMQ1yvEw0NZnvIjZcA4
+
+
+{
+  "businessName": "Skyline Technologies",
+  "ownerName": "Rahul Sharma",
+  "email": "skyline.tech@example.com",
+  "phone": "9876543210",
+  "gstNumber": "27ABCDE1234F1Z5",
+  "addressLine1": "45 Park Street",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "country": "India",
+  "postalCode": "400001",
+  "currency": "INR",
+  "logo": "https://example.com/skyline-logo.png",
+  "signature": "https://example.com/rahul-signature.png",
+  "invoicePrefix": "SKY",
+  "invoiceStartNumber": 1001,
+  "termsAndConditions": "Payment is due within 15 days from the invoice date."
+}
+
+### get business profile
+
+GET http://localhost:6000/api/v1/business
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NDUzOTQwLCJleHAiOjE3ODQ0NTQ4NDB9.7GZW4uIlIwncCjIV-xz-Fbi5KMQ1yvEw0NZnvIjZcA4
+
+
+
+### delete business profile
+
+DELETE  http://localhost:6000/api/v1/business
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NDUzOTQwLCJleHAiOjE3ODQ0NTQ4NDB9.7GZW4uIlIwncCjIV-xz-Fbi5KMQ1yvEw0NZnvIjZcA4
+
+
+### Update Business
+
+PATCH http://localhost:6000/api/v1/business
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NDUzOTQwLCJleHAiOjE3ODQ0NTQ4NDB9.7GZW4uIlIwncCjIV-xz-Fbi5KMQ1yvEw0NZnvIjZcA4
+
+
+{
+  "businessName": "Nextpen Solutions",
+  "phone": "9123456783",
+  "city": "pune"
+}
+

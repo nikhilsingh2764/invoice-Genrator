@@ -30,14 +30,66 @@ export const createBusinessService = async ({ businessData, userId }) => {
 
 
 
-export const getBusinessProfileService = async ({ userId }) => {
+export const getBusinessProfileService = async (userId) => {
+
+    console.log("User ID:", userId);
+    console.log("Controller reached");
+
+    const existedBusiness = await businessRepository.existsByUserId(userId);
+
+    if (!existedBusiness) {
+        throw new ApiError(409, "Business profile not exists.")
+    }
+
+    const businessProfile = await businessRepository.findByUserId(userId);
+
+
+    console.log("businessProfile :", businessProfile);
+
+
+    if (!businessProfile) {
+        throw new ApiError(409, "Business profile not fetch.")
+    }
+
+
+    return businessProfile;
 
 }
 
-export const updateBusinessProfileService = async ({ newBusinessData, userId }) => {
+//if want {newBusinessData, userId} {} in service first wrap contoller, service call in controller like this updateBusinessProfileService({newBusinessData, userId});
+
+export const updateBusinessProfileService = async ({newBusinessData, userId}) => {
+
+        console.log("userId:", userId);
+    console.log("newBusinessData:", newBusinessData);
+    const accountExist = await businessRepository.existsByUserId(userId);
+
+    if (!accountExist) {
+        throw new ApiError(409, "Account not exist")
+    }
+
+    const updatedData = await businessRepository.updateByUserId(userId, newBusinessData);
+
+    if (!updatedData) {
+        throw new ApiError(409, "Account not update successfully")
+    }
+
+
+    return updatedData;
 
 }
 
-export const deleteBusinessProfileService = async ({ userId }) => {
+
+export const deleteBusinessProfileService = async (userId) => {
+
+    const accountExist = await businessRepository.existsByUserId(userId);
+
+    if (!accountExist) {
+        throw new ApiError(409, "Account not exist")
+    }
+
+    await businessRepository.deleteByUserId(userId);
+
+    return null;
 
 }

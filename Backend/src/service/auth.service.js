@@ -611,7 +611,7 @@ export const DeleteAccountService = async (id, password) => {
     //delete account
     await UserRepository.findByIdAndDelete(id);
 
-    //return null;
+    return null;
 
 
 };

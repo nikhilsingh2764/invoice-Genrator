@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import userRouter from "./route/user.Router.js";
 import tokenRoutes  from "./route/token.routes.js"
+import businessRoutes from "./route/business.routes.js"
 import errorHandler from "./middleware/error.middleware.js";
 
 const app = express();
@@ -61,6 +62,7 @@ app.use(morgan("dev"));
 
 app.use('/api/v1',userRouter);  //routes at last after all middleware because when request come first go to all middleware then come to routes
 app.use('/api/v1',tokenRoutes);
+app.use('/api/v1',businessRoutes);
 
 
 // Global Error Handler (ALWAYS LAST)

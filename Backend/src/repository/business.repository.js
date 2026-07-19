@@ -36,8 +36,10 @@ class BusinessRepository {
 
     //update Business profile using userId
 
+    //we first use findByIdAndUpdate and get error becuase this only accept and search by _id
+    //know we use findOneAndUpdate allow to search on any feilds like in this userId
     async updateByUserId(userId, data) {
-        return await Business.findByIdAndUpdate(
+        return await Business.findOneAndUpdate(
             { userId },
             data,
             {

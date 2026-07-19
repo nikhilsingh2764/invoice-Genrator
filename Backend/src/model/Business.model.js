@@ -125,7 +125,6 @@ const businessSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-businessSchema.index({ userId: 1, });  //create index based on userId
 
 const Business = mongoose.model("Business", businessSchema)
 

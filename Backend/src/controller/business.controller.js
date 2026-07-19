@@ -5,7 +5,6 @@ import { createBusinessService, getBusinessProfileService, updateBusinessProfile
 
 
 
-
 export const createBusiness = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
@@ -22,19 +21,47 @@ export const createBusiness = TryCatch(async (req, res) => {
 
 export const getBusinessProfile = TryCatch(async (req, res) => {
 
+    const userId = req.user._id;
+
+    console.log("User ID:", userId);
+
+    const business = await getBusinessProfileService(userId);
+
+
+    return res.status(201).json(
+        new ApiResponse(201, "Business profile fetch successfully", business)
+    )
+
 
 });
 
 
 
 export const updateBusiness = TryCatch(async (req, res) => {
+    
+    const userId = req.user._id;
 
+    const newBusinessData = req.body;
+
+    const updatedBusiness = await updateBusinessProfileService({newBusinessData, userId});
+
+    return res.status(201).json(
+        new ApiResponse(201, "Business profile update successfully", updatedBusiness)
+    )
 
 });
 
 
 
 export const deleteBusiness = TryCatch(async (req, res) => {
+
+    const userId = req.user._id;
+
+    await deleteBusinessProfileService(userId);
+
+    return res.status(201).json(
+        new ApiResponse(201, "Business profile deleted successfully", null)
+    )
 
 
 });
