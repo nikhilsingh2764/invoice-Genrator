@@ -47,6 +47,9 @@ const businessSchema = new mongoose.Schema({
 
     },
 
+    // Business Address
+    address: {
+
     addressLine1: {
         type: String,
         trim: true,
@@ -80,7 +83,9 @@ const businessSchema = new mongoose.Schema({
         trim: true,
         required: true,
         match: /^[1-9][0-9]{5}$/
-    },
+    }
+    
+},
 
     currency: {
         type: String,

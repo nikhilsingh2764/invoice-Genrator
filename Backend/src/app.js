@@ -3,10 +3,16 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
+
 import userRouter from "./route/user.Router.js";
 import tokenRoutes  from "./route/token.routes.js"
 import businessRoutes from "./route/business.routes.js"
+import productRoutes from "./route/product.routes.js"
+import customerRoutes from  "./route/customer.routes.js"
+
+
 import errorHandler from "./middleware/error.middleware.js";
+
 
 const app = express();
 
@@ -64,18 +70,15 @@ app.use('/api/v1',userRouter);  //routes at last after all middleware because wh
 app.use('/api/v1',tokenRoutes);
 app.use('/api/v1',businessRoutes);
 
+app.use('/api/v1',productRoutes);
+app.use('/api/v1',customerRoutes);
+
 
 // Global Error Handler (ALWAYS LAST)
 app.use(errorHandler);
 
 
 export default app;
-
-
-
-
-
-
 
 
 

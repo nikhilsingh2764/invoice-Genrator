@@ -281,6 +281,63 @@ export const businessLimiter = rateLimit({
 
 
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+// product API Limiter
+// Create/Update/Delete product
+
+export const ProductLimiter = rateLimit({
+
+    store: createStore("product:"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 100,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: {
+
+        success: false,
+
+        message:
+            "Too many requests. Please try again later.",
+
+    },
+
+
+});
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+// Customer API Limiter
+// Create/Update/Delete Customer
+
+export const CustomerLimiter = rateLimit({
+
+    store: createStore("customer:"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 100,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: {
+
+        success: false,
+
+        message:
+            "Too many requests. Please try again later.",
+
+    },
+
+
+});
+
 
 
 

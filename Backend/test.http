@@ -119,6 +119,7 @@ Content-Type: application/json
 }
 
 
+##############################################################################################################################################################################################################################################################
 
 ### create new business
 
@@ -175,3 +176,143 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
   "city": "pune"
 }
 
+
+
+
+##############################################################################################################################################################################################################################################################
+
+### create new product
+
+
+POST http://localhost:6000/api/v1/product
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+
+{
+    "productName": "Laptop",
+    "description": "HP 15S Laptop",
+    "category": "Electronics",
+    "unit": "piece",
+    "price": 5000,
+    "taxRate": 12,
+    "discount": 5
+}
+
+
+
+### Get All Products
+
+GET http://localhost:6000/api/v1/product
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+
+
+### Get Product By ID
+
+GET http://localhost:6000/api/v1/product/6a5dc7815f4df1ac8be0b6d1
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+
+
+### Update Product
+
+PATCH http://localhost:6000/api/v1/product/6a5dc7815f4df1ac8be0b6d1
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+
+
+{
+    "productName": "Dell Inspiron 15",
+    "description": "Dell Inspiron 15 12th Gen Intel i5 Laptop",
+    "category": "Electronics",
+    "unit": "piece",
+    "price": 58999,
+    "taxRate": 18,
+    "discount": 10
+}
+
+### Delete Product
+
+DELETE http://localhost:6000/api/v1/product/6a5dc7815f4df1ac8be0b6d1
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+
+
+
+##############################################################################################################################################################################################################################################################
+
+
+### Create Customer
+
+POST http://localhost:6000/api/v1/customer
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4
+
+
+{
+    "customerName": "Priya Verma",
+    "email": "priya.verma2026@gmail.com",
+    "phone": "9123456780",
+    "companyName": "TechNova Solutions",
+    "gstNumber": "27ABCDE1234F1Z5",
+    "customerType": "Business",
+    "notes": "Preferred customer",
+
+    "billingAddress": {
+        "addressLine1": "101 Park Street",
+        "addressLine2": "Near City Mall",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "postalCode": "411001"
+    },
+
+    "shippingAddress": {
+        "addressLine1": "Warehouse 5",
+        "addressLine2": "MIDC Phase 2",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "postalCode": "411045"
+    }
+}
+
+### Get All Customers
+
+GET http://localhost:6000/api/v1/customer
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4
+
+
+### Get Customer By ID
+
+GET http://localhost:6000/api/v1/customer/6a5dcb76d1ee2c7e359307cd
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4
+
+
+### Update Customer
+
+PATCH http://localhost:6000/api/v1/customer/6a5dcb76d1ee2c7e359307cd
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4
+
+{
+    "customerName": "Priya Verma Updated",
+    "phone": "9988776655",
+    "companyName": "TechNova Pvt Ltd",
+    "notes": "VIP customer",
+
+    "billingAddress": {
+        "addressLine1": "202 FC Road",
+        "addressLine2": "Near Metro Station",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "postalCode": "411004"
+    }
+}
+
+
+
+
+
+### Delete Customer
+
+DELETE http://localhost:6000/api/v1/customer/6a5dcb76d1ee2c7e359307cd
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4

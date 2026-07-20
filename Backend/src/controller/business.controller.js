@@ -11,8 +11,8 @@ export const createBusiness = TryCatch(async (req, res) => {
 
     const business = await createBusinessService({ userId, businessData: req.body });
 
-    return res.status(201).json(
-        new ApiResponse(201, "Business profile created successfully", business)
+    return res.status(200).json(
+        new ApiResponse(200, "Business profile created successfully", business)
     )
 
 
@@ -28,8 +28,8 @@ export const getBusinessProfile = TryCatch(async (req, res) => {
     const business = await getBusinessProfileService(userId);
 
 
-    return res.status(201).json(
-        new ApiResponse(201, "Business profile fetch successfully", business)
+    return res.status(200).json(
+        new ApiResponse(200, "Business profile fetch successfully", business)
     )
 
 
@@ -45,8 +45,8 @@ export const updateBusiness = TryCatch(async (req, res) => {
 
     const updatedBusiness = await updateBusinessProfileService({newBusinessData, userId});
 
-    return res.status(201).json(
-        new ApiResponse(201, "Business profile update successfully", updatedBusiness)
+    return res.status(200).json(
+        new ApiResponse(200, "Business profile update successfully", updatedBusiness)
     )
 
 });
@@ -59,8 +59,8 @@ export const deleteBusiness = TryCatch(async (req, res) => {
 
     await deleteBusinessProfileService(userId);
 
-    return res.status(201).json(
-        new ApiResponse(201, "Business profile deleted successfully", null)
+    return res.status(200).json(
+        new ApiResponse(200, "Business profile deleted successfully", null)
     )
 
 
