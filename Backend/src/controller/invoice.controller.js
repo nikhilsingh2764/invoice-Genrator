@@ -4,7 +4,7 @@ import TryCatch from "../middleware/TryCatch.js";
 import {
     createInvoiceService, getAllInvoicesService,
     getInvoiceByIdService, updateInvoiceService, deleteInvoiceService,
-    downloadInvoicePDFService, sendInvoiceEmailService, sendInvoiceWhatsappService, duplicateInvoiceService
+    downloadInvoicePDFService, sendInvoiceEmailService, duplicateInvoiceService
 } from "../service/invoice.service.js";
 
 

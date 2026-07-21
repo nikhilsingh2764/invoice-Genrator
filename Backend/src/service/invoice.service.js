@@ -12,119 +12,120 @@ import generateInvoiceEmailContent from '../utils/ generateInvoiceEmailContent.j
 
 import sendEmail from './email.service.js';
 
+import mongoose from "mongoose";
+
+
 export const createInvoiceService = async (userData) => {
 
-    const {
+    const session = await mongoose.startSession();
 
-        userId,
-        customerId,
-        items,
-        dueDate,
-        paymentMethod,
-        notes,
-        status
+    try {
 
-    } = userData;
+        // Start transaction
+        session.startTransaction();
 
-    // Find Business
+        const {
+            userId,
+            customerId,
+            items,
+            dueDate,
+            paymentMethod,
+            notes,
+            status
+        } = userData;
 
-    const business = await businessRepository.findByUserId(userId);
+        // Increment invoice number
+        const business = await businessRepository.incrementInvoiceNumber(
+            userId,
+            session
+        );
 
-    if (!business) {
-        throw new ApiError(404, "Business profile not found");
+        if (!business) {
+            throw new ApiError(404, "Business profile not found");
+        }
+
+        // Find customer
+        const customer = await customerRepository.findById(customerId);
+
+        if (!customer) {
+            throw new ApiError(404, "Customer profile not found");
+        }
+
+        // Build invoice items
+        const {
+            invoiceItems,
+            subTotal,
+            totalTax,
+            totalDiscount,
+            grandTotal
+        } = await buildInvoiceItems(items);
+
+        const invoiceNumber =
+            `${business.invoicePrefix}-${business.invoiceStartNumber}`;
+
+        // Create invoice
+        const invoice = await invoiceRepository.create(
+            {
+                userId,
+
+                business: {
+                    businessName: business.businessName,
+                    ownerName: business.ownerName,
+                    email: business.email,
+                    phone: business.phone,
+                    gstNumber: business.gstNumber,
+                    logo: business.logo,
+                    signature: business.signature,
+                    currency: business.currency,
+                    address: business.address
+                },
+
+                customer: {
+                    customerName: customer.customerName,
+                    email: customer.email,
+                    phone: customer.phone,
+                    companyName: customer.companyName,
+                    gstNumber: customer.gstNumber,
+                    customerType: customer.customerType,
+                    notes: customer.notes,
+                    billingAddress: customer.billingAddress,
+                    shippingAddress: customer.shippingAddress
+                },
+
+                items: invoiceItems,
+
+                invoiceNumber,
+
+                subTotal,
+                totalTax,
+                totalDiscount,
+                grandTotal,
+
+                dueDate,
+                paymentMethod,
+                notes,
+
+                termsAndConditions: business.termsAndConditions,
+
+                status
+            },
+            session
+        );
+
+        await session.commitTransaction();
+
+        return invoice;
+
+    } catch (error) {
+
+        await session.abortTransaction();
+        throw error;
+
+    } finally {
+
+        await session.endSession();
+
     }
-
-    //find Customer
-
-    const customer = await customerRepository.findById(customerId)
-
-    if (!customer) {
-        throw new ApiError(404, "Customer profile not found");
-    }
-
-    //validate items
-
-    const {
-        invoiceItems,
-        subTotal,
-        totalTax,
-        totalDiscount,
-        grandTotal
-    } = await buildInvoiceItems(items);
-
-
-
-    // Generate invoice number
-    const updatedBusiness = await businessRepository.incrementInvoiceNumber(userId);
-
-    const invoiceNumber = `${updatedBusiness.invoicePrefix}-${updatedBusiness.invoiceStartNumber}`;
-
-
-
-    // Create invoice 
-    const invoice = await invoiceRepository.create({
-
-        userId,
-        business: {
-
-            businessName: business.businessName,
-            ownerName: business.ownerName,
-            email: business.email,
-            phone: business.phone,
-            gstNumber: business.gstNumber,
-            logo: business.logo,
-            signature: business.signature,
-            currency: business.currency,
-            address: business.address
-
-        },
-        customer: {
-
-            customerName: customer.customerName,
-            email: customer.email,
-            phone: customer.phone,
-            companyName: customer.companyName,
-            gstNumber: customer.gstNumber,
-            customerType: customer.customerType,
-            notes: customer.notes,
-            billingAddress: customer.billingAddress,
-            shippingAddress: customer.shippingAddress
-
-        },
-
-        items: invoiceItems,
-
-        invoiceNumber,
-
-        subTotal,
-
-        totalTax,
-
-        totalDiscount,
-
-        grandTotal,
-
-        dueDate,
-
-        paymentMethod,
-
-        notes,
-
-        termsAndConditions: business.termsAndConditions,
-
-        status
-
-    });
-
-
-    // Increment invoice number for next invoice
-    await businessRepository.updateByUserId(userId, {
-        invoiceStartNumber: business.invoiceStartNumber + 1
-    });
-
-    return invoice;
-
-
 };
 
 
@@ -281,14 +282,51 @@ export const sendInvoiceEmailService = async (userId, invoiceId) => {
 };
 
 
-export const sendInvoiceWhatsappService = async (userId, invoiceId) => {
-
-};
-
 
 export const duplicateInvoiceService = async (userId, invoiceId) => {
 
-};
+    // Find invoice
+    const invoice = await invoiceRepository.findById(userId, invoiceId);
 
+    if (!invoice) {
+        throw new ApiError(404, "Invoice not found");
+    }
+
+    // Generate next invoice number
+    const updatedBusiness = await businessRepository.incrementInvoiceNumber(userId);
+
+    if (!updatedBusiness) {
+        throw new ApiError(404, "Business profile not found");
+    }
+
+    const invoiceNumber =
+        `${updatedBusiness.invoicePrefix}-${updatedBusiness.invoiceStartNumber}`;
+
+    // Convert Mongoose document to plain object
+    const duplicateInvoice = invoice.toObject();
+
+    // Remove MongoDB generated fields
+    delete duplicateInvoice._id;
+    delete duplicateInvoice.__v;
+    delete duplicateInvoice.createdAt;
+    delete duplicateInvoice.updatedAt;
+
+    // Calculate original payment period
+    const paymentDuration =
+        new Date(invoice.dueDate) - new Date(invoice.invoiceDate);
+
+    // Update invoice fields
+    duplicateInvoice.invoiceNumber = invoiceNumber;
+    duplicateInvoice.status = "Draft";
+    duplicateInvoice.invoiceDate = new Date();
+    duplicateInvoice.dueDate = new Date(
+        duplicateInvoice.invoiceDate.getTime() + paymentDuration
+    );
+
+    // Create duplicated invoice
+    const newInvoice = await invoiceRepository.create(duplicateInvoice);
+
+    return newInvoice;
+};
 
 

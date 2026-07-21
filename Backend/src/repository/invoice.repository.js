@@ -2,8 +2,10 @@ import Invoice from "../model/invoice.model.js";
 
 class InvoiceRepository {
 
-    async create(userData) {
-        return await Invoice.create(userData);
+    async create(userData, session = null) {
+        const [invoice] = await Invoice.create([userData], { session });
+        return invoice;
+
     }
 
 
@@ -115,13 +117,13 @@ class InvoiceRepository {
 
         //pagination
 
-        const skip = (Number(page)-1) * Number(limit);
+        const skip = (Number(page) - 1) * Number(limit);
 
         const invoices = await Invoice
-                               .find(query)
-                               .sort(sort)
-                               .skip(skip)
-                               .limit(Number(limit))
+            .find(query)
+            .sort(sort)
+            .skip(skip)
+            .limit(Number(limit))
 
         const totalInvoices = await Invoice.countDocuments(query);
 

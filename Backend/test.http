@@ -330,7 +330,7 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 POST http://localhost:8000/api/v1/invoice
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjE0MDM0LCJleHAiOjE3ODQ2MTQ5MzR9.GXmGFM7KqpJIq1KLOSN5UtZWfd3WhZn2d9TMQ1wOPcM
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjMzODE1LCJleHAiOjE3ODQ2MzQ3MTV9.OQb2tXjYQ8Colp9X9pzJy_5o-G4FIb4ZPKLnFdkTOcI
 
 
 {
@@ -342,7 +342,7 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
     }
   ],
 "dueDate": "2026-07-01",
-  "status": "Draft",
+  "status": "Paid",
   "notes": "Invoice 4"
 }
 
@@ -532,6 +532,11 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 
 ### Send Invoice Email
-POST http://localhost:8000/api/v1/invoice/6a5f2a832aa82faf175f73a9/email
+POST http://localhost:8000/api/v1/invoice/6a5f55b13ddc6817cb6a0855/email
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjIyNDA1LCJleHAiOjE3ODQ2MjMzMDV9.yGGcIClE2PLMqQPMGokg14p8qzF8_so5TvF56ssEpNg
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjMyNTY2LCJleHAiOjE3ODQ2MzM0NjZ9.AAuWvHJAYMJUjakwq4C735ImwS0upMLBCk5cS3dYVGs
+
+### Duplicate Invoice
+POST http://localhost:8000/api/v1/invoice/6a5f55b13ddc6817cb6a0855/duplicate
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjMyNTY2LCJleHAiOjE3ODQ2MzM0NjZ9.AAuWvHJAYMJUjakwq4C735ImwS0upMLBCk5cS3dYVGs
