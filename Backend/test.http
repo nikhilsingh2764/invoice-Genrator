@@ -27,7 +27,7 @@ Content-Type: application/json
 
 ### login test 
 
-POST http://localhost:6000/api/v1/Login
+POST http://localhost:8000/api/v1/Login
 Content-Type: application/json
 
 {
@@ -126,26 +126,29 @@ Content-Type: application/json
 
 POST http://localhost:6000/api/v1/business
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NDUzOTQwLCJleHAiOjE3ODQ0NTQ4NDB9.7GZW4uIlIwncCjIV-xz-Fbi5KMQ1yvEw0NZnvIjZcA4
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
 
 
 {
-  "businessName": "Skyline Technologies",
+  "businessName": "Nextpen Solutions",
   "ownerName": "Rahul Sharma",
   "email": "skyline.tech@example.com",
-  "phone": "9876543210",
+  "phone": "9123456783",
   "gstNumber": "27ABCDE1234F1Z5",
-  "addressLine1": "45 Park Street",
-  "city": "Mumbai",
-  "state": "Maharashtra",
-  "country": "India",
-  "postalCode": "400001",
+  "address": {
+    "addressLine1": "45 Park Street",
+    "addressLine2": "",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "400001"
+  },
   "currency": "INR",
-  "logo": "https://example.com/skyline-logo.png",
   "signature": "https://example.com/rahul-signature.png",
+  "logo": "https://example.com/skyline-logo.png",
   "invoicePrefix": "SKY",
   "invoiceStartNumber": 1001,
-  "termsAndConditions": "Payment is due within 15 days from the invoice date."
+  "termsAndConditions": "Payment is due within 15 days."
 }
 
 ### get business profile
@@ -241,15 +244,15 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 ### Create Customer
 
-POST http://localhost:6000/api/v1/customer
+POST http://localhost:8000/api/v1/customer
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjIxMzI0LCJleHAiOjE3ODQ2MjIyMjR9.89dvqCwrDLg9UyXYyYw7Vv-P_b0bZ-N-8OC8z1q3NcA
 
 
 {
     "customerName": "Priya Verma",
-    "email": "priya.verma2026@gmail.com",
-    "phone": "9123456780",
+    "email": "nikhilsinghdfg@gmail.com",
+    "phone": "8407937952",
     "companyName": "TechNova Solutions",
     "gstNumber": "27ABCDE1234F1Z5",
     "customerType": "Business",
@@ -316,3 +319,219 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 DELETE http://localhost:6000/api/v1/customer/6a5dcb76d1ee2c7e359307cd
 Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMxODA3LCJleHAiOjE3ODQ1MzI3MDd9.6hjTYKEKn6Himwia9DiCDApUVvIG1g6LlsM10Dp3Dk4
+
+
+
+
+##############################################################################################################################################################################################################################################################
+
+
+### Create Invoice
+
+POST http://localhost:8000/api/v1/invoice
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjE0MDM0LCJleHAiOjE3ODQ2MTQ5MzR9.GXmGFM7KqpJIq1KLOSN5UtZWfd3WhZn2d9TMQ1wOPcM
+
+
+{
+  "customerId": "6a5f2a382aa82faf175f73a8",
+  "items": [
+    {
+      "productId": "6a5dc858c1ba391834611985",
+      "quantity": 2
+    }
+  ],
+"dueDate": "2026-07-01",
+  "status": "Draft",
+  "notes": "Invoice 4"
+}
+
+### ============================================
+### Get All Invoices
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Pagination - Page 1
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?page=1&limit=5
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Pagination - Page 2
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?page=2&limit=5
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+
+
+### ============================================
+### Search by Customer Name
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?search=Rahul Sharma
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+
+### ============================================
+### Search by Email
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?search=rahul@gmail.com
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+
+### ============================================
+### Search by Invoice Number
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?search=INV-1001
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+
+### ============================================
+### Filter - Pending
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?status=Pending
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+
+### ============================================
+### Filter - Paid
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?status=Paid
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Filter - Overdue
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?status=Overdue
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Date Filter
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?startDate=2026-07-01&endDate=2026-07-31
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Sort by Created Date (Newest)
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?sortBy=createdAt&sortOrder=desc
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Sort by Created Date (Oldest)
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?sortBy=createdAt&sortOrder=asc
+Cookie: accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+### ============================================
+### Sort by Grand Total
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?sortBy=grandTotal&sortOrder=desc
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+### ============================================
+### Combined Filter + Search + Pagination
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?status=Pending&search=Rahul&page=1&limit=5&sortBy=createdAt&sortOrder=desc
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+### ============================================
+### Invalid Status
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?status=Invalid
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Invalid Page
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?page=-1&limit=5
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Invalid Limit
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice?limit=abc
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTc5ODUxLCJleHAiOjE3ODQ1ODA3NTF9.MuB-WgepHnCtD_SthHsJHbEdjZXE3WzVLWkGYNA3Xwc
+
+
+### ============================================
+### Unauthorized
+### ============================================
+
+GET http://localhost:6000/api/v1/invoice
+
+
+
+### Get Invoice By ID
+
+GET http://localhost:6000/api/v1/invoice/6a5e8757c128c6fb4cc25715
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjEyNzc5LCJleHAiOjE3ODQ2MTM2Nzl9.wI4nifmI49Zkv_EbzGt7D963t0x5scWezz_ZpgwAvmA
+
+### Update Invoice
+
+
+PATCH http://localhost:6000/api/v1/invoice/6a5e8757c128c6fb4cc25715
+Content-Type: application/json
+Cookie: accessToken=  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjE0MDM0LCJleHAiOjE3ODQ2MTQ5MzR9.GXmGFM7KqpJIq1KLOSN5UtZWfd3WhZn2d9TMQ1wOPcM
+
+{
+  "customerId": "6a5dca902faa65acbee1e4d7",
+  "items": [
+    {
+      "productId": "6a5dc858c1ba391834611985",
+      "quantity": 3
+    }
+  ],
+  "dueDate": "2026-08-10",
+  "status": "Pending",
+  "notes": "Updated invoice after customer request"
+}
+
+
+
+
+### Update Invoice
+
+
+DELETE  http://localhost:8000/api/v1/invoice/6a5e893ac128c6fb4cc2571a
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjE2MTYxLCJleHAiOjE3ODQ2MTcwNjF9.FEagP6Cq-PcUKr6StKwEVK81IZgT9SBNfX24iMoYA2A
+
+
+
+
+### Send Invoice Email
+POST http://localhost:8000/api/v1/invoice/6a5f2a832aa82faf175f73a9/email
+Content-Type: application/json
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NjIyNDA1LCJleHAiOjE3ODQ2MjMzMDV9.yGGcIClE2PLMqQPMGokg14p8qzF8_so5TvF56ssEpNg

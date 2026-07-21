@@ -343,6 +343,129 @@ export const CustomerLimiter = rateLimit({
 
 
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+// invoice API Limiter
+
+const rateLimitMessage = {
+    success: false,
+    message: "Too many requests. Please try again later."
+};
+
+export const invoiceCreateLimiter = rateLimit({
+
+    store: createStore("invoice:create"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 30,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+});
 
 
+
+export const invoiceReadLimiter = rateLimit ({
+
+    store: createStore("invoice:create"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 300,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+});
+
+
+export const invoiceUpdateLimiter = rateLimit ({
+
+    store: createStore("invoice:update:"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 100,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+
+});
+
+
+export const invoiceDeleteLimiter = rateLimit ({
+
+    store: createStore("invoice:delete:"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 20,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+
+});
+
+
+export const invoiceEmailLimiter = rateLimit ({
+
+    store: createStore("invoice:email:"),
+
+    windowMs: 60 * 60 * 1000,
+
+    max: 30,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+
+});
+
+
+export const invoiceWhatsappLimiter = rateLimit ({
+
+    store: createStore("invoice:whatsapp:"),
+
+    windowMs: 60 * 60 * 1000,
+
+    max: 10,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+
+});
+
+
+
+export const invoiceDuplicateLimiter = rateLimit ({
+
+    store: createStore("invoice:duplicate:"),
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 20,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: rateLimitMessage
+
+});
 

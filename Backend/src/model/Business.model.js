@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import addressSchema from "./address.model.js";
 
 
 const businessSchema = new mongoose.Schema({
@@ -49,43 +50,9 @@ const businessSchema = new mongoose.Schema({
 
     // Business Address
     address: {
-
-    addressLine1: {
-        type: String,
-        trim: true,
+        type: addressSchema,
         required: true
     },
-
-    city: {
-        type: String,
-        trim: true,
-        required: true
-    },
-
-    state: {
-        type: String,
-        trim: true,
-        required: true,
-        enum: ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"],
-        default: "Assam",
-    },
-
-    country: {
-        type: String,
-        trim: true,
-        required: true,
-        enum: ["India"],
-        default: "India"
-    },
-
-    postalCode: {
-        type: String,
-        trim: true,
-        required: true,
-        match: /^[1-9][0-9]{5}$/
-    }
-    
-},
 
     currency: {
         type: String,

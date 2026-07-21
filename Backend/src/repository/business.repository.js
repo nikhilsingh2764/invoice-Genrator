@@ -59,6 +59,17 @@ class BusinessRepository {
     }
 
 
+    async incrementInvoiceNumber(userId) {
+    return await Business.findOneAndUpdate(
+        { userId },
+        { $inc: { invoiceStartNumber: 1 } },
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+}
+
     
 };
 
