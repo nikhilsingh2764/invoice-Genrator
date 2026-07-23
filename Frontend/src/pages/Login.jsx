@@ -1,6 +1,7 @@
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Card from "../components/common/Card";
+import GoogleLoginButton from "../components/common/GoogleLoginButton";
 
 import { useForm } from "react-hook-form"; //Main hook from React Hook Form. Manages form state, validation, submission and errors.
 import { zodResolver } from "@hookform/resolvers/zod"; //Connects the Zod validation schema  with React Hook Form. Every submit is validated using LoginSchema.
@@ -67,6 +68,18 @@ function Login() {
                     subtitle="Welcome back! Please login to continue."
                 >
 
+
+ <GoogleLoginButton />
+
+    <div className="my-5 flex items-center">
+        <hr className="flex-1" />
+        <span className="px-3 text-sm text-gray-500">
+            OR
+        </span>
+        <hr className="flex-1" />
+    </div>
+
+    
                     <form
                         onSubmit={handleSubmit(onSubmit)}
                         className="space-y-5"
@@ -108,6 +121,9 @@ function Login() {
                         >
                             Login
                         </Button>
+
+
+
 
                         <p className="text-center text-sm text-gray-600">
                             Don't have an account?{" "}

@@ -100,7 +100,7 @@ export const VerifyOTPService = async ({ email, otp }) => {
         html: welcomeTemplate(user.username)
     });
 
-return user;
+    return user;
 
 };
 
@@ -283,20 +283,20 @@ export const LoginService = async (userdata) => {
 
     );
 
-console.log(accessToken)
-console.log("refreshToken :",refreshToken)
+    console.log(accessToken)
+    console.log("refreshToken :", refreshToken)
 
-await refreshTokenRepository.create({
+    await refreshTokenRepository.create({
 
-    userId: user._id,
+        userId: user._id,
 
-    token: refreshToken,
+        token: refreshToken,
 
-    expiresAt: new Date(
-        Date.now() + 15 * 24 * 60 * 60 * 1000
-    )
+        expiresAt: new Date(
+            Date.now() + 15 * 24 * 60 * 60 * 1000
+        )
 
-});
+    });
 
 
 
@@ -326,27 +326,27 @@ await refreshTokenRepository.create({
 export const ProfileService = async (userId) => {
 
     //find user using ID
-        const user = await UserRepository.findById(userId);
+    const user = await UserRepository.findById(userId);
 
-            if (!user) {
-                    throw new ApiError(404, "user not exist")
-                        }
+    if (!user) {
+        throw new ApiError(404, "user not exist")
+    }
 
-                            //return profile data
-                                return {
+    //return profile data
+    return {
 
-                                        id: user._id,
-                                                username: user.username,
-                                                        email: user.email,
-                                                                isVerified: user.isVerified,
-                                                                        isActive: user.isActive,
-                                                                                createdAt: user.createdAt,
-                                                                                        updatedAt: user.updatedAt
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
 
-                                                                                            }
+    }
 
 
-                                                                                            };
+};
 
 
 
@@ -425,10 +425,19 @@ export const ForgotPasswordService = async (email) => {
     email = email.trim().toLowerCase();
 
     //check user exists
-    const user = await UserRepository.findByEmail(email);
+    const user = await UserRepository.findByEmailWithoutPassword(email);
 
     if (!user) {
         throw new ApiError(404, "user not found")
+    }
+
+    if (user.provider === "GOOGLE") {
+
+        throw new ApiError(
+            400,
+            "Google account does not support password reset. Please login with Google."
+        );
+
     }
 
     //remove old password reset history from db
@@ -466,25 +475,29 @@ export const ResetPasswordService = async ({ email, otp, newPassword }) => {
     email = email.trim().toLowerCase();
 
     // Find user
-    const user = await UserRepository.findByEmail(email);
+    const user = await UserRepository.findByEmailWithoutPassword(email);
 
     if (!user) {
         throw new ApiError(404, "User not found");
     }
 
+    if (user.provider === "GOOGLE") {
+
+        throw new ApiError(
+            400,
+            "Google account does not support password reset"
+        );
+
+    }
 
     //find Otp
     const otpdata = await otpRepository.findByEmailAndType(email, "PASSWORD_RESET")
-   
-    console.log(otpdata);
-    console.log("DB OTP:", otpdata.otp);
-    console.log("Request OTP:", otp);
-    console.log("Equal?", otpdata.otp === otp);
 
 
     if (!otpdata) {
         throw new ApiError(400, "Invalid OTP");
     }
+
 
     // Check expiry
     if (otpdata.expiresAt < new Date()) {
@@ -546,7 +559,7 @@ export const updatePasswordService = async (id, data) => {
 
     //hash new password
 
-    const newHashedPassword =await bcrypt.hash(newPassword, 10)
+    const newHashedPassword = await bcrypt.hash(newPassword, 10)
 
     //update password in DB
     await UserRepository.updateProfile(id, { password: newHashedPassword })
@@ -561,13 +574,13 @@ export const updatePasswordService = async (id, data) => {
 export const DeactivateAccountService = async (id) => {
 
     //check user exist
-    const user =await UserRepository.findById(id);
+    const user = await UserRepository.findById(id);
 
     if (!user) {
         throw new ApiError(404, "User not exist")
     }
 
-    console.log("accoynt is",user.isActive);
+    console.log("accoynt is", user.isActive);
 
     //check already de-activate
     if (!user.isActive) {

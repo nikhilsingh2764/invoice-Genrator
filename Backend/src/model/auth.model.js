@@ -23,8 +23,10 @@ const authSchema = new mongoose.Schema({
 
     password: {
         type: String,
-        required: true,
         minlength: 8,
+        required: function () {
+        return this.provider === "LOCAL";
+    },
         select: false
     },
 
@@ -43,6 +45,17 @@ const authSchema = new mongoose.Schema({
     failedLoginAttempts: {
         type: Number,
         default: 0
+    },
+
+    provider: {
+        type: String,
+        enum: ["LOCAL", "GOOGLE"],
+        default: "LOCAL"
+    },
+
+    googleId: {
+        type: String,
+        default: null
     },
 
 

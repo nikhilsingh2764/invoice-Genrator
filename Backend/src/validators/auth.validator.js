@@ -64,7 +64,7 @@ export const LoginValidator = [
         .isEmail().withMessage("Invalid email format")  //isEmail check email format
         .normalizeEmail(), // Convert email to standard format
 
-    
+
     body("password")
         .notEmpty()
         .withMessage("Password is required")
@@ -82,3 +82,113 @@ export const LoginValidator = [
 
 ]
 
+
+
+
+// Update Profile
+
+export const updateProfileValidator = [
+
+    body("username")
+        .optional()
+        .trim()
+        .isLength({ min: 3, max: 30 })
+        .withMessage("Username must be between 3 and 30 characters")
+        .matches(/^[A-Za-z0-9_]+$/)
+        .withMessage("Username can only contain letters, numbers, and underscores")
+
+];
+
+
+
+// Change Password
+
+export const changePasswordValidator = [
+
+    body("oldPassword")
+        .notEmpty()
+        .withMessage("Old password is required"),
+
+
+    body("newPassword")
+        .notEmpty()
+        .withMessage("New password is required")
+        .isLength({ min: 8 })
+        .withMessage("Password must have minimum 8 characters")
+        .matches(/[A-Z]/)
+        .withMessage("Password must contain one uppercase letter")
+        .matches(/[a-z]/)
+        .withMessage("Password must contain one lowercase letter")
+        .matches(/[0-9]/)
+        .withMessage("Password must contain one number")
+        .matches(/[@$!%*?&]/)
+        .withMessage("Password must contain one special character"),
+
+
+    body("confirmPassword")
+        .notEmpty()
+        .withMessage("Confirm password is required")
+
+];
+
+
+
+// Forgot Password
+
+export const forgotPasswordValidator = [
+
+    body("email")
+        .trim()
+        .notEmpty()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Invalid email format")
+        .normalizeEmail()
+
+];
+
+
+
+// Reset Password
+
+export const resetPasswordValidator = [
+
+    body("email")
+        .trim()
+        .notEmpty()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Invalid email format")
+        .normalizeEmail(),
+
+
+    body("otp")
+        .trim()
+        .notEmpty()
+        .withMessage("OTP is required")
+        .isLength({ min: 6, max: 6 })
+        .withMessage("OTP must be 6 digits")
+        .isNumeric()
+        .withMessage("OTP must contain only numbers"),
+
+
+    body("newPassword")
+        .notEmpty()
+        .withMessage("New password is required")
+        .isLength({ min: 8 })
+        .withMessage("Password must have minimum 8 characters")
+        .matches(/[A-Z]/)
+        .withMessage("Password must contain one uppercase letter")
+        .matches(/[a-z]/)
+        .withMessage("Password must contain one lowercase letter")
+        .matches(/[0-9]/)
+        .withMessage("Password must contain one number")
+        .matches(/[@$!%*?&]/)
+        .withMessage("Password must contain one special character"),
+
+
+    body("confirmPassword")
+        .notEmpty()
+        .withMessage("Confirm password is required")
+
+];

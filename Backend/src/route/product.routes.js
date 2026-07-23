@@ -10,17 +10,42 @@ import { createProduct, getAllProducts, getProductById, updateProduct, deletePro
 const router = express.Router();
 
 
-router.post('/product', ProductLimiter, authMiddleware, createProductValidator, validate, createProduct);
+router.post(
+    '/product', 
+    ProductLimiter, 
+    authMiddleware, 
+    createProductValidator, 
+    validate, 
+    createProduct
+);
 
-router.get('/product', authMiddleware, getAllProducts);
+router.get(
+    '/product', 
+    authMiddleware, 
+    getAllProducts
+);
 
-router.get('/product/:id', authMiddleware, getProductById);
+router.get(
+    '/product/:id', 
+    authMiddleware, 
+    getProductById
+);
 
-router.patch('/product/:id', ProductLimiter, authMiddleware, createProductValidator, validate, updateProduct);
+router.patch(
+    '/product/:id', 
+    ProductLimiter, 
+    authMiddleware, 
+    createProductValidator, 
+    validate, 
+    updateProduct
+);
 
-router.delete('/product/:id', ProductLimiter, authMiddleware, deleteProduct);
-
-
+router.delete(
+    '/product/:id', 
+    ProductLimiter, 
+    authMiddleware, 
+    deleteProduct
+);
 
 
 export default router;

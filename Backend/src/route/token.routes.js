@@ -5,7 +5,10 @@ import { refreshTokenLimiter } from '../middleware/rateLimiter.middleware.js';
 
 const router = express.Router();
 
-router.post('/refresh-token', refreshTokenLimiter, RefreshToken)
+router.post(
+    '/refresh-token', 
+    refreshTokenLimiter, 
+    RefreshToken)
 
 
 export default router;

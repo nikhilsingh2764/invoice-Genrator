@@ -1,7 +1,7 @@
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Card from "../components/common/Card";
-
+import GoogleLoginButton from "../components/common/GoogleLoginButton";
 import { useForm } from "react-hook-form"; //Main hook from React Hook Form. Manages form state, validation, submission and errors.
 import { zodResolver } from "@hookform/resolvers/zod"; //Connects the Zod validation schema  with React Hook Form. Every submit is validated using signupSchema.
 import { toast } from "react-hot-toast";
@@ -73,6 +73,17 @@ function Signup() {
                 title="Create Account"
                 subtitle="Create your account to continue"
             >
+
+
+ <GoogleLoginButton />
+
+    <div className="my-5 flex items-center">
+        <hr className="flex-1" />
+        <span className="px-3 text-sm text-gray-500">
+            OR
+        </span>
+        <hr className="flex-1" />
+    </div>
 
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 

@@ -1,4 +1,5 @@
 const welcomeTemplate = (username) => {
+
     return `
     <!DOCTYPE html>
     <html>
@@ -69,6 +70,7 @@ const welcomeTemplate = (username) => {
 
     </body>
     </html>
+    
     `;
 };
 

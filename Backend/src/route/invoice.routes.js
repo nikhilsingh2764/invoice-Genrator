@@ -19,24 +19,72 @@ import {
 
 const router = express.Router();
 
-router.post("/invoice", invoiceCreateLimiter, authMiddleware, createInvoiceValidator, validate, createInvoice)
+router.post(
+    "/invoice",
+    invoiceCreateLimiter,
+    authMiddleware,
+    createInvoiceValidator,
+    validate,
+    createInvoice
+)
 
-router.get("/invoice", invoiceReadLimiter, authMiddleware, getAllInvoices)
+router.get(
+    "/invoice",
+    invoiceReadLimiter,
+    authMiddleware,
+    getAllInvoices
+)
 
-router.get("/invoice/:id", invoiceReadLimiter, authMiddleware, getInvoiceById)
+router.get(
+    "/invoice/:id",
+    invoiceReadLimiter,
+    authMiddleware,
+    getInvoiceById
+)
 
-router.patch("/invoice/:id", invoiceUpdateLimiter, authMiddleware, updateInvoiceValidator, validate, updateInvoice)
+router.patch(
+    "/invoice/:id",
+    invoiceUpdateLimiter,
+    authMiddleware,
+    updateInvoiceValidator,
+    validate,
+    updateInvoice
+)
 
-router.delete("/invoice/:id", invoiceDeleteLimiter, authMiddleware, deleteInvoice)
+router.delete(
+    "/invoice/:id",
+    invoiceDeleteLimiter,
+    authMiddleware,
+    deleteInvoice
+)
 
-router.get("/invoice/:id/pdf", authMiddleware, downloadInvoicePDF)
+router.get(
+    "/invoice/:id/pdf",
+    authMiddleware,
+    downloadInvoicePDF
+)
 
 
-router.post("/invoice/:id/email", invoiceEmailLimiter, authMiddleware, sendInvoiceEmail)
+router.post(
+    "/invoice/:id/email",
+    invoiceEmailLimiter,
+    authMiddleware,
+    sendInvoiceEmail
+)
 
-router.post("/invoice/:id/whatsapp", invoiceWhatsappLimiter, authMiddleware, sendInvoiceWhatsapp)
+router.post(
+    "/invoice/:id/whatsapp",
+    invoiceWhatsappLimiter,
+    authMiddleware,
+    sendInvoiceWhatsapp
+)
 
-router.post("/invoice/:id/duplicate", invoiceDuplicateLimiter, authMiddleware, duplicateInvoice)
+router.post(
+    "/invoice/:id/duplicate",
+    invoiceDuplicateLimiter,
+    authMiddleware,
+    duplicateInvoice
+)
 
 
 export default router;

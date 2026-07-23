@@ -13,7 +13,7 @@ const startServer = async () => {
 
       await  connectDB();
 
-        app.listen(PORT, () => {                               //method in express that starts the server 
+        app.listen(PORT, () => {  //method in express that starts the server 
             console.log(`server is running at port ${PORT} `);
             console.log(`http://localhost:${PORT}`);
         })

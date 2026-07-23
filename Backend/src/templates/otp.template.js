@@ -1,4 +1,5 @@
 const otpTemplate = (username, otp) => {  
+
     return `
     <!DOCTYPE html>
     <html>
@@ -61,6 +62,7 @@ const otpTemplate = (username, otp) => {
     </body>
 
     </html>
+    
     `;
 
 };

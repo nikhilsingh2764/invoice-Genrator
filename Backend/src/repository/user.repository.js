@@ -13,6 +13,11 @@ class UserRepository {
 
     //find
 
+    async findByEmailWithoutPassword(email) {
+        return await User.findOne({ email });
+    }
+
+
     async findByEmail(email) {
         return await User.findOne({ email }).select("+password");
     }
