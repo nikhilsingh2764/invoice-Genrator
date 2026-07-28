@@ -1,50 +1,4 @@
 
-//Rate limiting controls how many requests a user can send within a specific time.
-
-//we use redis-rate limit instead of normal reson:
-{/*
-
-in normal rate limit : 
-
-
-
-export const authLimiter = rateLimit({
-
-    windowMs: 15 * 60 * 1000,
-
-    max: 5,
-
-    message: {
-        success: false,
-        message: "Too many attempts, try again after 15 minutes"
-    },
-
-    standardHeaders: true,
-    legacyHeaders: false
-
-});
-
-it store count in your Node.js process memory.
-like:- Node Server Memory
-
-{
-   "192.168.1.10": 3,
-   "192.168.1.20": 5,
-   "192.168.1.30": 1
-}
-
-problem is when server restart memory become empty {}. so attacker quickly get 5 new request immediately
-another problem is in big applciation multipe server are there like A,B,C.. :request 1 to server A
-                                    
-
-redis -rate limit solve all this:-
-
-in normal, count is store in multiple server
-but in redis all server count is store in redis cache so every server get same count
-
-
-*/}
-
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 
 //code of redis rate limit ok
@@ -147,7 +101,7 @@ export const verifyOtpLimiter = rateLimit({
 
     windowMs: 15 * 60 * 1000, //15 min
 
-    max: 10,  //10 request 
+    max: 30,  //10 request 
 
     standardHeaders: true,
 

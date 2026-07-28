@@ -1,5 +1,5 @@
 import express from 'express';
-import RefreshToken from '../../model/auth/refreshToken.model.js';
+import {RefreshToken} from '../../controller/auth/token.controller.js';
 import { refreshTokenLimiter } from '../../middleware/rateLimiter.middleware.js';
 
 

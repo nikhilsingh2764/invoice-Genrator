@@ -1,11 +1,11 @@
 import { body } from "express-validator";
 
-
 const passwordValidator = (fieldName) => {
 
     return body(fieldName)
         .notEmpty()
         .withMessage(`${fieldName} is required`)
+        .bail()
         .isLength({ min: 8 })
         .withMessage("Password must have minimum 8 characters")
         .matches(/[A-Z]/)
@@ -156,8 +156,8 @@ export const resetPasswordValidator = [
     body("confirmPassword")
         .notEmpty()
         .withMessage("Confirm password is required")
+        .bail()
         .custom((value, { req }) => {
-
             if (value !== req.body.newPassword) {
                 throw new Error("Passwords do not match");
             }

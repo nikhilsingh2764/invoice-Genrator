@@ -60,51 +60,54 @@ export const SignupService = async (userdata) => {
 
 export const VerifyOTPService = async ({ email, otp }) => {
 
+    const otpData = await otpRepository.findByEmailAndType(
+        email,
+        "EMAIL_VERIFICATION"
+    );
 
-
-    //find old record
-    const otpData = await otpRepository.findByEmail(email);
 
     if (!otpData) {
-        throw new ApiError(400, 'Invalid OTP');
+        throw new ApiError(400, "Invalid OTP");
     }
 
-    //check opt expiry
+
     if (otpData.expiresAt < new Date()) {
 
         await otpRepository.deleteById(otpData._id);
+
         throw new ApiError(400, "OTP has expired");
 
     }
 
-    //verify otp
-    if (otpData.otp !== otp) {
-        throw new ApiError(400, 'Invalid OTP');
+
+    if (String(otpData.otp) !== String(otp)) {
+
+        throw new ApiError(400, "Invalid OTP");
+
     }
 
-    // create user
+
     const user = await userRepository.create({
         email: otpData.email,
         username: otpData.username,
         password: otpData.password,
         isVerified: true
-    })
+    });
 
 
-    //remove all opt record form db after successful verification
     await otpRepository.deleteById(otpData._id);
 
-    //send welcome email
+
     await sendEmail({
         to: user.email,
         subject: "successful verification",
         html: welcomeTemplate(user.username)
     });
 
+
     return user;
 
 };
-
 
 export const LoginService = async (userdata) => {
 
