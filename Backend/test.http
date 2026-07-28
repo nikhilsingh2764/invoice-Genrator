@@ -1,6 +1,6 @@
 ### Signup - Send OTP
 
-POST http://localhost:6000/api/v1/signup
+POST http://localhost:8000/api/v1/signup
 Content-Type: application/json
 
 {

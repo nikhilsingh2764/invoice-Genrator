@@ -46,6 +46,8 @@ const sendEmail = async ({
 
     } catch (error) {
 
+            console.log("EMAIL ERROR:", error);
+
         throw new ApiError(
             500,
             "Failed to send email"
