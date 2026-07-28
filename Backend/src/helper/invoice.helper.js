@@ -1,5 +1,5 @@
 import ApiError from "../utils/ApiError.js";
-import productRepository from "../repository/product.repository.js";
+import productRepository from "../repository/invoice/product.repository.js";
 
 export const buildInvoiceItems = async (items) => {
 

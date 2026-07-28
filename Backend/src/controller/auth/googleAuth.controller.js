@@ -1,4 +1,4 @@
-import { googleLoginService } from "../../service/googleAuth.service.js";
+import { googleLoginService } from "../../service/auth/googleAuth.service.js";
 import ApiResponse from "../../utils/ApiResponse.js";
 import TryCatch from "../../middleware/TryCatch.js";
 

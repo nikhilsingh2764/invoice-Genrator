@@ -1,5 +1,5 @@
 import TryCatch from "../../middleware/TryCatch.js";
-import RefreshTokenService from "../../service/refreshToken.service.js";
+import RefreshTokenService from "../../service/auth/refreshToken.service.js";
 import ApiResponse from "../../utils/ApiResponse.js";
 
 

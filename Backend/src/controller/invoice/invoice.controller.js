@@ -5,7 +5,7 @@ import {
     createInvoiceService,
     getInvoiceByIdService, updateInvoiceService, deleteInvoiceService,
     downloadInvoicePDFService, sendInvoiceEmailService, duplicateInvoiceService
-} from "../../service/invoice.service.js";
+} from "../../service/invoice/invoice.service.js";
 
 
 export const createInvoice = TryCatch(async (req, res) => {

@@ -2,7 +2,7 @@ import express from 'express';
 import validate from '../../middleware/validate.js';
 import authMiddleware from '../../middleware/auth.middleware.js';
 
-import { googleLoginController } from '../../controller/googleAuth.controller.js';
+import { googleLoginController } from '../../controller/auth/googleAuth.controller.js';
 
 import {
     Signup, DeactivateAccount, ForgotPassword, ResetPassword, VerifyOTP,

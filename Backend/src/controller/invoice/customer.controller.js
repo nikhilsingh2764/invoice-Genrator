@@ -2,7 +2,7 @@
 import {
     createCustomerService, getAllCustomersService, getCustomerByIdService,
     updateCustomerService, deleteCustomerService
-} from "../../service/customer.service.js";
+} from "../../service/invoice/customer.service.js";
 
 import ApiResponse from "../../utils/ApiResponse.js";
 import TryCatch from "../../middleware/TryCatch.js";

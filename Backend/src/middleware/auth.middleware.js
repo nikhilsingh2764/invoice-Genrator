@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
-import UserRepository from "../repository/user.repository.js";
+import UserRepository from "../repository/auth/user.repository.js";
 import TryCatch from "./TryCatch.js";
 
 const authMiddleware = TryCatch(async (req, res, next) => {

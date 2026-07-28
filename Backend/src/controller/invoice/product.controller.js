@@ -7,7 +7,7 @@ import {
     getProductByIdService,
     updateProductService,
     deleteProductService
-} from "../../service/product.service.js";
+} from "../../service/invoice/product.service.js";
 
 
 

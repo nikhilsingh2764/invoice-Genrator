@@ -1,7 +1,10 @@
 import TryCatch from "../../middleware/TryCatch.js";
 import ApiResponse from "../../utils/ApiResponse.js";
 
-import { createBusinessService, getBusinessProfileService, updateBusinessProfileService, deleteBusinessProfileService } from "../../service/invoice/business.service.js";
+import {
+    createBusinessService, getBusinessProfileService,
+    updateBusinessProfileService, deleteBusinessProfileService
+} from "../../service/invoice/business.service.js";
 
 
 
@@ -38,12 +41,12 @@ export const getBusinessProfile = TryCatch(async (req, res) => {
 
 
 export const updateBusiness = TryCatch(async (req, res) => {
-    
+
     const userId = req.user._id;
 
     const newBusinessData = req.body;
 
-    const updatedBusiness = await updateBusinessProfileService({newBusinessData, userId});
+    const updatedBusiness = await updateBusinessProfileService({ newBusinessData, userId });
 
     return res.status(200).json(
         new ApiResponse(200, "Business profile update successfully", updatedBusiness)

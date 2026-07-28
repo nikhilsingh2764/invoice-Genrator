@@ -8,12 +8,13 @@ import generateInvoicePDF from '../../utils/generateInvoicePDF.js';
 
 import { buildInvoiceItems } from '../../helper/invoice.helper.js';
 
-import generateInvoiceEmailContent from '../../utils/ generateInvoiceEmailContent.js';
-
-import sendEmail from './email.service.js';
+import generateInvoiceEmailContent from "../../utils/generateInvoiceEmailContent.js"
 
 import mongoose from "mongoose";
 import redis from "../../config/redis.js";
+
+
+import sendEmail from "../auth/email.service.js";
 
 
 
