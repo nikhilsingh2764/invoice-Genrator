@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
-import UserRepository from "../repository/auth/user.repository.js";
+import userRepository from "../repository/auth/user.repository.js";
 import TryCatch from "./TryCatch.js";
 
 const authMiddleware = TryCatch(async (req, res, next) => {
@@ -22,7 +22,7 @@ const authMiddleware = TryCatch(async (req, res, next) => {
     console.log(decoded);
 
     //find latest user in DB
-    const user = await UserRepository.findById(decoded.id);
+    const user = await userRepository.findById(decoded.id);
 
     console.log(user);
 

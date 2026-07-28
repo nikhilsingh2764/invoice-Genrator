@@ -34,13 +34,13 @@ export const SignupService = async (userdata) => {
 
     // Business Logic
 
-    const emailExist = await UserRepository.emailExist(email);
+    const emailExist = await userRepository.emailExist(email);
 
     if (emailExist) {
         throw new ApiError(409, "Email already exists");
     }
 
-    const usernameExist = await UserRepository.usernameExist(username);
+    const usernameExist = await userRepository.usernameExist(username);
 
     if (usernameExist) {
         throw new ApiError(409, "Username already exists");
@@ -83,7 +83,7 @@ export const VerifyOTPService = async ({ email, otp }) => {
     }
 
     // create user
-    const user = await UserRepository.create({
+    const user = await userRepository.create({
         email: otpData.email,
         username: otpData.username,
         password: otpData.password,
@@ -116,7 +116,7 @@ export const LoginService = async (userdata) => {
 
 
     // Find user
-    const user = await UserRepository.findByEmail(email);
+    const user = await userRepository.findByEmail(email);
 
 
     if (!user) {
@@ -206,7 +206,7 @@ export const LoginService = async (userdata) => {
 
 
 
-        await UserRepository.updateProfile(
+        await userRepository.updateProfile(
             user._id,
             {
                 failedLoginAttempts:
@@ -239,7 +239,7 @@ export const LoginService = async (userdata) => {
     ) {
 
 
-        await UserRepository.updateProfile(
+        await userRepository.updateProfile(
             user._id,
             {
                 failedLoginAttempts: 0,
@@ -335,7 +335,7 @@ export const ProfileService = async (userId) => {
 
 
     //find user using ID
-    const user = await UserRepository.findById(userId);
+    const user = await userRepository.findById(userId);
 
     if (!user) {
         throw new ApiError(404, "user not exist")
@@ -394,7 +394,7 @@ export const UpdateProfileService = async (userId, data) => {
     // Check username exists
     if (username) {
 
-        const existingUser = await UserRepository.findByUsername(username);
+        const existingUser = await userRepository.findByUsername(username);
 
         // If username belongs to another user
         if (existingUser && existingUser._id.toString() !== userId.toString()) {
@@ -405,7 +405,7 @@ export const UpdateProfileService = async (userId, data) => {
 
 
     // Update profile
-    const updatedUser = await UserRepository.updateProfile(
+    const updatedUser = await userRepository.updateProfile(
         userId,
         {
             username
@@ -443,7 +443,7 @@ export const ForgotPasswordService = async (email) => {
     email = email.trim().toLowerCase();
 
     //check user exists
-    const user = await UserRepository.findByEmailWithoutPassword(email);
+    const user = await userRepository.findByEmailWithoutPassword(email);
 
     if (!user) {
         throw new ApiError(404, "user not found")
@@ -492,7 +492,7 @@ export const ResetPasswordService = async ({ email, otp, newPassword }) => {
     email = email.trim().toLowerCase();
 
     // Find user
-    const user = await UserRepository.findByEmailWithoutPassword(email);
+    const user = await userRepository.findByEmailWithoutPassword(email);
 
     if (!user) {
         throw new ApiError(404, "User not found");
@@ -534,7 +534,7 @@ export const ResetPasswordService = async ({ email, otp, newPassword }) => {
 
 
     //update password
-    await UserRepository.updateProfile(
+    await userRepository.updateProfile(
         user._id,
         {
             password: hashedNewPassword
@@ -559,7 +559,7 @@ export const updatePasswordService = async (id, data) => {
     }
 
     //Find user with password
-    const user = await UserRepository.findByIdWithPassword(id)
+    const user = await userRepository.findByIdWithPassword(id)
 
     if (!user) {
         throw new ApiError(400, "User not found");
@@ -578,7 +578,7 @@ export const updatePasswordService = async (id, data) => {
     const newHashedPassword = await bcrypt.hash(newPassword, 10)
 
     //update password in DB
-    await UserRepository.updateProfile(id, { password: newHashedPassword })
+    await userRepository.updateProfile(id, { password: newHashedPassword })
 
     return null;
 
@@ -590,7 +590,7 @@ export const updatePasswordService = async (id, data) => {
 export const DeactivateAccountService = async (id) => {
 
     //check user exist
-    const user = await UserRepository.findById(id);
+    const user = await userRepository.findById(id);
 
     if (!user) {
         throw new ApiError(404, "User not exist")
@@ -604,7 +604,7 @@ export const DeactivateAccountService = async (id) => {
     }
 
     //De-Activate account
-    await UserRepository.deactivateAccount(id);
+    await userRepository.deactivateAccount(id);
 
     return null;
 
@@ -621,7 +621,7 @@ export const DeleteAccountService = async (id, password) => {
     }
 
     //find user exist
-    const user = await UserRepository.findByIdWithPassword(id);
+    const user = await userRepository.findByIdWithPassword(id);
 
     if (!user) {
         throw new ApiError(400, "user not found")
@@ -638,7 +638,7 @@ export const DeleteAccountService = async (id, password) => {
 
 
     //delete account
-    await UserRepository.findByIdAndDelete(id);
+    await userRepository.findByIdAndDelete(id);
 
     await redis.del(`profile:${id}`);
     

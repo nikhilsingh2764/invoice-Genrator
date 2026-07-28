@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import ApiError from "../../utils/ApiError.js";
-import UserRepository from "../../repository/auth/user.repository.js";
+import userRepository from "../../repository/auth/user.repository.js";
 import generateToken from "../../utils/generateToken.js";
 import refreshTokenRepository from "../../repository/auth/refreshToken.repository.js";
 
@@ -60,7 +60,7 @@ const RefreshTokenService = async (refreshToken) => {
     // Find user
 
     const user =
-        await UserRepository.findById(decoded.id);
+        await userRepository.findById(decoded.id);
 
 
 

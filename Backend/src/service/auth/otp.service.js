@@ -4,7 +4,7 @@ import generateOTP from '../../utils/generateOTP.js';
 import sendEmail from './email.service.js';
 import otpTemplate from '../../templates/otp.template.js';
 import resetPasswordTemplate from "../../templates/resetPassword.template.js";
-import UserRepository from '../../repository/auth/user.repository.js';
+import userRepository from '../../repository/auth/user.repository.js';
 
 const SALT_ROUNDS = 10;
 
