@@ -5,21 +5,15 @@ import ApiError from "../../utils/ApiError.js";
 // Create reusable SMTP transporter
 const transporter = nodemailer.createTransport({
 
-    host: "smtp.gmail.com",
+    host: process.env.EMAIL_HOST,
 
-    family: 4,
-
-    port: 587,
+    port: Number(process.env.EMAIL_PORT),
 
     secure: false,
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    },
-
-    tls: {
-        rejectUnauthorized: false
     },
 
     connectionTimeout: 30000,
@@ -31,7 +25,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// Verify SMTP connection on server startup
+// Verify SMTP connection on startup
 transporter.verify((error) => {
 
     if (error) {
@@ -52,7 +46,7 @@ transporter.verify((error) => {
 });
 
 
-// Reusable email sending service
+// Send email service
 const sendEmail = async ({
     to,
     subject,
@@ -62,9 +56,9 @@ const sendEmail = async ({
 
     try {
 
-        const mailOptions = {
+        const info = await transporter.sendMail({
 
-            from: `"Auth System" <${process.env.EMAIL_USER}>`,
+            from: `"Invoice App" <${process.env.EMAIL_USER}>`,
 
             to,
 
@@ -74,10 +68,7 @@ const sendEmail = async ({
 
             attachments
 
-        };
-
-
-        const info = await transporter.sendMail(mailOptions);
+        });
 
 
         console.log(
