@@ -1,12 +1,4 @@
-import * as brevo from "@getbrevo/brevo";
 import ApiError from "../../utils/ApiError.js";
-
-const apiInstance = new brevo.TransactionalEmailsApi();
-
-apiInstance.setApiKey(
-    brevo.TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY
-);
 
 const sendEmail = async ({
     to,
@@ -16,24 +8,60 @@ const sendEmail = async ({
 
     try {
 
-        await apiInstance.sendTransacEmail({
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
 
-            sender: {
-                name: "Invoice App",
-                email: process.env.EMAIL_USER
+            method: "POST",
+
+            headers: {
+
+                "accept": "application/json",
+
+                "content-type": "application/json",
+
+                "api-key": process.env.BREVO_API_KEY
+
             },
 
-            to: [
-                {
-                    email: to
-                }
-            ],
+            body: JSON.stringify({
 
-            subject,
+                sender: {
 
-            htmlContent: html
+                    name: "Invoice App",
+
+                    email: process.env.EMAIL_USER
+
+                },
+
+                to: [
+
+                    {
+
+                        email: to
+
+                    }
+
+                ],
+
+                subject,
+
+                htmlContent: html
+
+            })
 
         });
+
+        if (!response.ok) {
+
+            const error = await response.text();
+
+            console.error(error);
+
+            throw new ApiError(
+                500,
+                "Failed to send email"
+            );
+
+        }
 
         console.log("EMAIL SENT");
 
