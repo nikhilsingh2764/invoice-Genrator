@@ -24,6 +24,12 @@ const transporter = nodemailer.createTransport({
 
 });
 
+console.log({
+    EMAIL_HOST: process.env.EMAIL_HOST,
+    EMAIL_PORT: process.env.EMAIL_PORT,
+    EMAIL_USER: process.env.EMAIL_USER
+});
+
 
 // Verify SMTP connection on startup
 transporter.verify((error) => {
