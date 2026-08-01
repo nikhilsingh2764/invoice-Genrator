@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
 import ApiError from "../../utils/ApiError.js";
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
 
 
 // Create reusable SMTP transporter
