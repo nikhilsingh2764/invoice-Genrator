@@ -4,8 +4,8 @@ POST http://localhost:8000/api/v1/signup
 Content-Type: application/json
 
 {
-    "username": "nikhilcs",
-    "email": "nikhilsinghd276@gmail.com",
+    "username": "nikhilcdsdss",
+    "email": "nikhilsinghdfg@gmail.com",
     "password": "dhn245dfgAA@"
 }
 
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 {
     "username": "nikhilputess",
-    "email": "nikhilsinghd2345@gmail.com",
+    "email": "nikhilsinghdfg@gmail.com",
     "password": "dhn245dfgAA@"
 }
 

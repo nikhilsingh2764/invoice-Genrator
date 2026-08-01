@@ -1,52 +1,58 @@
 import nodemailer from "nodemailer";
 import ApiError from "../../utils/ApiError.js";
-import dns from "dns";
-
-dns.setDefaultResultOrder("ipv4first");
 
 
 // Create reusable SMTP transporter
 const transporter = nodemailer.createTransport({
 
-    host: process.env.EMAIL_HOST,
+    host: "smtp.gmail.com",
 
-    port: Number(process.env.EMAIL_PORT),
+    family: 4,
 
-    secure: Number(process.env.EMAIL_PORT) === 465,
+    port: 587,
+
+    secure: false,
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-     tls: {
+
+    tls: {
         rejectUnauthorized: false
     },
 
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
+    connectionTimeout: 30000,
+
+    greetingTimeout: 30000,
+
+    socketTimeout: 30000
 
 });
 
 
-// Verify SMTP connection when application starts
+// Verify SMTP connection on server startup
 transporter.verify((error) => {
 
     if (error) {
 
-        console.error("SMTP CONNECTION FAILED:", error.message);
+        console.error(
+            "SMTP CONNECTION FAILED:",
+            error.message
+        );
 
     } else {
 
-        console.log("SMTP SERVER READY");
+        console.log(
+            "SMTP SERVER READY"
+        );
 
     }
 
 });
 
 
-
-// Send email service
+// Reusable email sending service
 const sendEmail = async ({
     to,
     subject,
@@ -56,7 +62,7 @@ const sendEmail = async ({
 
     try {
 
-        const info = await transporter.sendMail({
+        const mailOptions = {
 
             from: `"Auth System" <${process.env.EMAIL_USER}>`,
 
@@ -68,7 +74,10 @@ const sendEmail = async ({
 
             attachments
 
-        });
+        };
+
+
+        const info = await transporter.sendMail(mailOptions);
 
 
         console.log(
