@@ -1,98 +1,45 @@
-import nodemailer from "nodemailer";
+import * as brevo from "@getbrevo/brevo";
 import ApiError from "../../utils/ApiError.js";
 
+const apiInstance = new brevo.TransactionalEmailsApi();
 
-// Create reusable SMTP transporter
-const transporter = nodemailer.createTransport({
+apiInstance.setApiKey(
+    brevo.TransactionalEmailsApiApiKeys.apiKey,
+    process.env.BREVO_API_KEY
+);
 
-    host: process.env.EMAIL_HOST,
-
-    port: Number(process.env.EMAIL_PORT),
-
-    secure: false,
-
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-
-    connectionTimeout: 30000,
-
-    greetingTimeout: 30000,
-
-    socketTimeout: 30000
-
-});
-
-console.log({
-    EMAIL_HOST: process.env.EMAIL_HOST,
-    EMAIL_PORT: process.env.EMAIL_PORT,
-    EMAIL_USER: process.env.EMAIL_USER
-});
-
-
-// Verify SMTP connection on startup
-transporter.verify((error) => {
-
-    if (error) {
-
-        console.error(
-            "SMTP CONNECTION FAILED:",
-            error.message
-        );
-
-    } else {
-
-        console.log(
-            "SMTP SERVER READY"
-        );
-
-    }
-
-});
-
-
-// Send email service
 const sendEmail = async ({
     to,
     subject,
-    html,
-    attachments = []
+    html
 }) => {
 
     try {
 
-        const info = await transporter.sendMail({
+        await apiInstance.sendTransacEmail({
 
-            from: `"Invoice App" <${process.env.EMAIL_USER}>`,
+            sender: {
+                name: "Invoice App",
+                email: process.env.EMAIL_USER
+            },
 
-            to,
+            to: [
+                {
+                    email: to
+                }
+            ],
 
             subject,
 
-            html,
-
-            attachments
+            htmlContent: html
 
         });
 
-
-        console.log(
-            "EMAIL SENT:",
-            info.messageId
-        );
-
-
-        return info;
-
+        console.log("EMAIL SENT");
 
     } catch (error) {
 
-        console.error(
-            "EMAIL SEND ERROR:",
-            error.message
-        );
-
+        console.error(error);
 
         throw new ApiError(
             500,
@@ -102,6 +49,5 @@ const sendEmail = async ({
     }
 
 };
-
 
 export default sendEmail;
