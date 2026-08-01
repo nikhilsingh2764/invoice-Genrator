@@ -16,6 +16,9 @@ const RefreshTokenService = async (refreshToken) => {
         );
     }
 
+    console.log("STEP 1 - refresh token received");
+
+
 
     // Verify refresh token
     let decoded;
@@ -26,8 +29,10 @@ const RefreshTokenService = async (refreshToken) => {
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET
         );
+        console.log("STEP 2 - decoded:", decoded);
 
-    } catch(error){
+    } catch (error) {
+        console.log("JWT ERROR:", error.message);
 
         throw new ApiError(
             401,
@@ -40,13 +45,16 @@ const RefreshTokenService = async (refreshToken) => {
 
     // Check token exists in database
 
-    const storedToken =
-        await refreshTokenRepository.findByToken(
-            refreshToken
-        );
+    console.log("Incoming token length:", refreshToken.length);
 
 
-    if(!storedToken){
+    const storedToken = await refreshTokenRepository.findByToken(
+        refreshToken
+    );
+
+    console.log("STEP 3 - Stored Token:", storedToken);
+
+    if (!storedToken) {
 
         throw new ApiError(
             401,
@@ -59,10 +67,9 @@ const RefreshTokenService = async (refreshToken) => {
 
     // Find user
 
-    const user =
-        await userRepository.findById(decoded.id);
+    const user = await userRepository.findById(decoded.id);
 
-
+    console.log("STEP 4 - User:", user);
 
     if (!user) {
 
@@ -90,19 +97,19 @@ const RefreshTokenService = async (refreshToken) => {
 
     // Delete old refresh token
 
-    await refreshTokenRepository.deleteByToken(
+  const deleted =  await refreshTokenRepository.deleteByToken(
         refreshToken
     );
 
-
+console.log("Deleted:", deleted);
 
     // Generate new access token
 
     const newAccessToken =
         generateToken(
             {
-                id:user._id,
-                email:user.email
+                id: user._id,
+                email: user.email
             },
             process.env.ACCESS_TOKEN_SECRET,
             process.env.ACCESS_TOKEN_EXPIRES_IN
@@ -116,7 +123,7 @@ const RefreshTokenService = async (refreshToken) => {
     const newRefreshToken =
         generateToken(
             {
-                id:user._id
+                id: user._id
             },
             process.env.REFRESH_TOKEN_SECRET,
             process.env.REFRESH_TOKEN_EXPIRES_IN
@@ -129,11 +136,11 @@ const RefreshTokenService = async (refreshToken) => {
 
     await refreshTokenRepository.create({
 
-        userId:user._id,
+        userId: user._id,
 
-        token:newRefreshToken,
+        token: newRefreshToken,
 
-        expiresAt:new Date(
+        expiresAt: new Date(
             Date.now() +
             15 * 24 * 60 * 60 * 1000
         )

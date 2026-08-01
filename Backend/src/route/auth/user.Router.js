@@ -24,7 +24,7 @@ const router = express.Router();
 
 
 router.post(
-    '/Signup',
+    '/signup',
     signupLimiter,
     signupValidator,
     validate,
@@ -40,7 +40,7 @@ router.post(
 )
 
 router.post(
-    '/Login',
+    '/login',
     loginLimiter,
     LoginValidator,
     validate,
@@ -48,20 +48,20 @@ router.post(
 )
 
 router.get(
-    '/Profile',
+    '/profile',
     apiLimiter,
     authMiddleware,
     Profile
 )
 
 router.post(
-    '/Logout',
+    '/logout',
     authMiddleware,
     Logout
 )
 
 router.patch(
-    '/Update-Profile',
+    '/update-profile',
     apiLimiter,
     authMiddleware,
     updateProfileValidator,

@@ -467,3 +467,258 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODR
 GET http://localhost:8000/api/v1/?search=tech&status=Paid&sort=-createdAt&page=1&limit=10
 Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQxk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
 
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+# BUSINESS TEST
+#################################################################
+
+### Create Business 1
+
+POST http://localhost:8000/api/v1/business
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+
+{
+  "businessName": "TechNova Solutions",
+  "ownerName": "Rahul Sharma",
+  "email": "rahul@technova.com",
+  "phone": "9876543210",
+  "gstNumber": "27ABCDE1234F1Z5",
+  "address": {
+    "addressLine1": "FC Road",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411004"
+  },
+  "currency": "INR",
+  "invoicePrefix": "TN",
+  "invoiceStartNumber": 1001
+}
+
+
+### Get Business
+
+GET http://localhost:8000/api/v1/business
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+
+
+
+# CUSTOMER TEST
+#################################################################
+
+### Create Customer 1
+
+POST http://localhost:8000/api/v1/customer
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "customerName": "Amit Patil",
+  "email": "amit@gmail.com",
+  "phone": "9876543211",
+  "companyName": "Apex Technologies",
+  "gstNumber": "27AAAAA1111A1Z1",
+  "customerType": "Business",
+  "notes": "Regular customer",
+  "billingAddress": {
+    "addressLine1": "Baner Road",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411045"
+  },
+  "shippingAddress": {
+    "addressLine1": "Baner Road",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411045"
+  }
+}
+
+
+
+### Create Customer 2
+
+POST http://localhost:8000/api/v1/customer
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "customerName": "Priya Verma",
+  "email": "priya@gmail.com",
+  "phone": "9876543212",
+  "companyName": "CodeWave Pvt Ltd",
+  "customerType": "Business",
+  "notes": "Premium customer",
+  "billingAddress": {
+    "addressLine1": "Hinjewadi",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411057"
+  },
+  "shippingAddress": {
+    "addressLine1": "Hinjewadi",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411057"
+  }
+}
+
+
+
+### Get Customers
+
+GET http://localhost:8000/api/v1/customer
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+
+
+# PRODUCT TEST
+#################################################################
+
+### Create Product 1
+
+POST http://localhost:8000/api/v1/product
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "productName": "Laptop",
+  "description": "Dell Inspiron Laptop",
+  "category": "Electronics",
+  "unit": "piece",
+  "price": 55000,
+  "taxRate": 18,
+  "discount": 5
+}
+
+
+
+### Create Product 2
+
+POST http://localhost:8000/api/v1/product
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "productName": "Mechanical Keyboard",
+  "description": "RGB Gaming Keyboard",
+  "category": "Accessories",
+  "unit": "piece",
+  "price": 3000,
+  "taxRate": 18,
+  "discount": 10
+}
+
+
+
+### Create Product 3
+
+POST http://localhost:8000/api/v1/product
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "productName": "Monitor",
+  "description": "27 inch 4K Monitor",
+  "category": "Electronics",
+  "unit": "piece",
+  "price": 25000,
+  "taxRate": 18,
+  "discount": 0
+}
+
+
+
+### Get Products
+
+GET http://localhost:8000/api/v1/product
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+
+
+# INVOICE TEST
+#################################################################
+
+Replace:
+- customerId
+- productId
+
+with IDs from above responses.
+
+
+### Create Invoice 1
+
+POST http://localhost:8000/api/v1/invoice
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "customerId": "6a6dbed24fba6cbdd21388f6",
+  "items": [
+    {
+      "productId": "6a6dbef64fba6cbdd21388f8",
+      "quantity": 2
+    }
+  ],
+  "dueDate": "2026-08-15",
+  "status": "Paid",
+  "notes": "First invoice"
+}
+
+### Create Invoice 2
+
+POST http://localhost:8000/api/v1/invoice
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "customerId": "6a6dbed24fba6cbdd21388f6",
+  "items": [
+    {
+      "productId": "6a6dbef64fba6cbdd21388f8",
+      "quantity": 3
+    }
+  ],
+  "dueDate": "2026-08-20",
+  "status": "Pending",
+  "notes": "Second invoice"
+}
+
+
+
+
+### Create Invoice 3
+
+POST http://localhost:8000/api/v1/invoice
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU1NzY3MzcsImV4cCI6MTc4NTU3OTczN30.RfYeiVwkt1p6peUcoEFiGBb9TfReIqsRvVmisVzdhJc
+
+{
+  "customerId": "6a6dbed24fba6cbdd21388f6",
+  "items": [
+    {
+      "productId": "6a6dbef64fba6cbdd21388f8",
+      "quantity": 5
+    }
+  ],
+  "dueDate": "2026-09-01",
+  "status": "Paid",
+  "notes": "Third invoice"
+}

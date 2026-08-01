@@ -3,9 +3,11 @@ import ApiResponse from "../../utils/ApiResponse.js";
 import { accessTokenOptions, refreshTokenOptions } from "../../utils/cookieOptions.js";
 
 
-import { SignupService, LoginService, ProfileService, LogoutService, VerifyOTPService, 
-UpdateProfileService, ForgotPasswordService, ResetPasswordService,
-updatePasswordService, DeactivateAccountService, DeleteAccountService } from "../../service/auth/auth.service.js";
+import {
+    SignupService, LoginService, ProfileService, LogoutService, VerifyOTPService,
+    UpdateProfileService, ForgotPasswordService, ResetPasswordService,
+    updatePasswordService, DeactivateAccountService, DeleteAccountService
+} from "../../service/auth/auth.service.js";
 
 
 
@@ -47,12 +49,19 @@ export const Login = TryCatch(async (req, res) => {
     const { user, accessToken, refreshToken } = await LoginService(req.body);
 
     //store tokens in res cookie
+    console.log("SETTING COOKIE");
+
 
     res.cookie("accessToken", accessToken, accessTokenOptions);
 
     res.cookie("refreshToken", refreshToken, refreshTokenOptions);
 
 
+    console.log("COOKIE HEADER:");
+    console.log(res.getHeaders()["set-cookie"]);
+
+
+    
     return res.status(200).json(
         new ApiResponse(200, "Login Successful", user)
     );
@@ -201,10 +210,10 @@ export const ResetPassword = TryCatch(async (req, res) => {
 
     const { email, otp, newPassword } = req.body;
 
-    await ResetPasswordService({email, otp, newPassword})
+    await ResetPasswordService({ email, otp, newPassword })
 
     return res.status(200).json(
-        new ApiResponse(200,"Password reset successfully",null)
+        new ApiResponse(200, "Password reset successfully", null)
     )
 
 });
