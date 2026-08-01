@@ -1,5 +1,34 @@
 import api from "../api/axios";
 
+
+// Authentication API endpoints.
+const AUTH_ENDPOINTS = {
+
+    LOGIN: "/login",
+
+    SIGNUP: "/signup",
+
+    VERIFY_OTP: "/verify-otp",
+
+    FORGOT_PASSWORD: "/forgot-password",
+
+    RESET_PASSWORD: "/reset-password",
+
+    LOGOUT: "/logout",
+
+    PROFILE: "/profile",
+
+    CHANGE_PASSWORD: "/change-password",
+
+    UPDATE_PROFILE: "/Update-Profile",
+
+    DEACTIVATE_ACCOUNT: "/deactivate-account",
+
+    DELETE_ACCOUNT: "/delete-account",
+
+
+};
+
 // ==========================
 // Signup
 // ==========================
@@ -7,7 +36,7 @@ import api from "../api/axios";
 export const signup = async (data) => {
 
     const response = await api.post(
-        "/Signup",
+        AUTH_ENDPOINTS.SIGNUP,
         data
     );
 
@@ -23,7 +52,7 @@ export const signup = async (data) => {
 export const verifyOtp = async (data) => {
 
     const response = await api.post(
-        "/verify-otp",
+        AUTH_ENDPOINTS.VERIFY_OTP,
         data
     );
 
@@ -39,7 +68,7 @@ export const verifyOtp = async (data) => {
 export const login = async (data) => {
 
     const response = await api.post(
-        "/Login",
+        AUTH_ENDPOINTS.LOGIN,
         data
     );
 
@@ -55,7 +84,7 @@ export const login = async (data) => {
 export const logout = async () => {
 
     const response = await api.post(
-        "/Logout"
+        AUTH_ENDPOINTS.LOGOUT
     );
 
     return response.data;
@@ -70,7 +99,7 @@ export const logout = async () => {
 export const forgotPassword = async (data) => {
 
     const response = await api.post(
-        "/forgot-password",
+        AUTH_ENDPOINTS.FORGOT_PASSWORD,
         data
     );
 
@@ -86,7 +115,7 @@ export const forgotPassword = async (data) => {
 export const resetPassword = async (data) => {
 
     const response = await api.post(
-        "/reset-password",
+        AUTH_ENDPOINTS.RESET_PASSWORD,
         data
     );
 
@@ -102,7 +131,7 @@ export const resetPassword = async (data) => {
 export const getProfile = async () => {
 
     const response = await api.get(
-        "/Profile",
+        AUTH_ENDPOINTS.PROFILE,
     );
 
     return response.data;
@@ -115,7 +144,7 @@ export const getProfile = async () => {
 
 export const deactivateAccount = async () => {
     const response = await api.patch(
-        "/deactivate-account",
+        AUTH_ENDPOINTS.DEACTIVATE_ACCOUNT,
     );
 
     return response.data;
@@ -128,7 +157,7 @@ export const deactivateAccount = async () => {
 
 export const deleteAccount = async (data) => {
     const response = await api.delete(
-        "/delete-account",
+        AUTH_ENDPOINTS.DELETE_ACCOUNT,
         {
             data
         }
