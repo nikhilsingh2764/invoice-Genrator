@@ -2,24 +2,45 @@ import nodemailer from "nodemailer";
 import ApiError from "../../utils/ApiError.js";
 
 
-// Reusable transporter for sending all application emails
+// Create reusable SMTP transporter
 const transporter = nodemailer.createTransport({
 
     host: process.env.EMAIL_HOST,
 
-    port: process.env.EMAIL_PORT,
+    port: Number(process.env.EMAIL_PORT),
 
-    secure: false,
+    secure: Number(process.env.EMAIL_PORT) === 465,
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
+
+});
+
+
+// Verify SMTP connection when application starts
+transporter.verify((error) => {
+
+    if (error) {
+
+        console.error("SMTP CONNECTION FAILED:", error.message);
+
+    } else {
+
+        console.log("SMTP SERVER READY");
+
     }
 
 });
 
 
 
+// Send email service
 const sendEmail = async ({
     to,
     subject,
@@ -29,7 +50,7 @@ const sendEmail = async ({
 
     try {
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
 
             from: `"Auth System" <${process.env.EMAIL_USER}>`,
 
@@ -44,9 +65,22 @@ const sendEmail = async ({
         });
 
 
+        console.log(
+            "EMAIL SENT:",
+            info.messageId
+        );
+
+
+        return info;
+
+
     } catch (error) {
 
-            console.log("EMAIL ERROR:", error);
+        console.error(
+            "EMAIL SEND ERROR:",
+            error.message
+        );
+
 
         throw new ApiError(
             500,
