@@ -1,56 +1,133 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
-import Layout from "../components/layout/Layout";
+import PublicLayout from "../layout/publicLayout/publicLayout";
+import DashboardLayout from "../layout/privateLayout/privateLayout";
 
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Signup from "../pages/Signup";
-import VerifyOTP from "../pages/VerifyOTP";
-import ForgotPassword from "../pages/ForgotPassword";
-import Profile from "../pages/Profile";
-import NotFound from "../pages/NotFound";
-import EditProfile from "../pages/EditProfile";
-import ChangePassword from "../pages/changePassword";
+import Home from "../pages/auth/Home";
+
+import Login from "../pages/auth/Login";
+import Signup from "../pages/auth/Signup";
+import VerifyOTP from "../pages/auth/VerifyOTP";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+
+import Dashboard from "../pages/dashboard/Dashboard";
+
+import Profile from "../pages/profile/Profile";
+import EditProfile from "../pages/profile/EditProfile";
+import ChangePassword from "../pages/profile/ChangePassword";
+
+import ProtectedRoute from "./ProtectedRoute";
+import PublicRoute from "./PublicRoute";
+
 
 function AppRoutes() {
+
     return (
-        <BrowserRouter>
 
-            <Routes>
+        <Routes>
 
-                {/* Layout Routes */}
-                <Route element={<Layout />}>
 
-                    <Route path="/" element={<Home />} />
+            {/* =====================
+                Public Routes
+            ====================== */}
 
-                    <Route path="/login" element={<Login />} />
+            <Route element={<PublicLayout />}>
 
-                    <Route path="/signup" element={<Signup />} />
+                <Route
+                    path="/"
+                    element={<Home />}
+                />
 
-                    <Route path="/verify-otp" element={<VerifyOTP />} />
 
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
 
-                    <Route path="/profile" element={<Profile />} />
 
-                    <Route path="/EditProfile" element={<EditProfile />} />
+                <Route
+                    path="/signup"
+                    element={
+                        <PublicRoute>
+                            <Signup />
+                        </PublicRoute>
+                    }
+                />
 
-                    <Route path="/change-password"  element={<ChangePassword />}/>
 
-                </Route>
+                <Route
+                    path="/verify-otp"
+                    element={<VerifyOTP />}
+                />
 
-                {/* 404 Page */}
-                <Route path="*" element={<NotFound />} />
 
-            </Routes>
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPassword />}
+                />
 
-        </BrowserRouter>
+
+                <Route
+                    path="/reset-password"
+                    element={<ResetPassword />}
+                />
+
+            </Route>
+
+
+
+
+            {/* =====================
+                Protected Routes
+            ====================== */}
+
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <DashboardLayout />
+                    </ProtectedRoute>
+                }
+            >
+
+
+                <Route
+                    path="/dashboard"
+                    element={<Dashboard />}
+                />
+
+
+                <Route
+                    path="/profile"
+                    element={<Profile />}
+                />
+
+
+                <Route
+                    path="/edit-profile"
+                    element={<EditProfile />}
+                />
+
+
+                <Route
+                    path="/change-password"
+                    element={<ChangePassword />}
+                />
+
+
+            </Route>
+
+
+
+        </Routes>
+
     );
+
 }
 
-export default AppRoutes;
 
-//BrowserRouter = Enables client-side routing using the browser's history API.
-//Routes = Matches the current URL and renders the correct Route.
-//Route = Maps a URL path to a React component.
-//path="*" = Catch-all route.
+export default AppRoutes;

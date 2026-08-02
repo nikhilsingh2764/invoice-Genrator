@@ -1,37 +1,165 @@
 import { create } from "zustand";
 
-const useAuthStore = create((set) => ({  //create: Creates a global Zustand store.
+import {
+    logout as logoutService
+} from "../services/auth.service";
 
-    // Logged in user
-    user: null,  //Stores the logged-in user's information.
 
-    // Login status
-    isAuthenticated: false,  //Indicates whether the user is logged in or not.
 
-    // Loading state
-    loading: false, //Tracks API request state.
+const getStoredUser = () => {
 
-    // Save user after login
-    login: (userData) =>   //Updates the store after a successful login.
+    try {
+
+        const user = localStorage.getItem("user");
+
+
+        if (!user || user === "undefined") {
+            return null;
+        }
+
+
+        return JSON.parse(user);
+
+
+    } catch(error) {
+
+        console.log(
+            "Local storage parse error:",
+            error
+        );
+
+        localStorage.removeItem("user");
+
+        return null;
+
+    }
+
+};
+
+
+
+
+
+const useAuthStore = create((set) => ({
+
+
+    user: getStoredUser(),
+
+
+
+    isAuthenticated:
+        !!getStoredUser(),
+
+
+
+    isLoading:false,
+
+
+
+
+
+    login:(user)=>{
+
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
+
+
+
         set({
-            user: userData,
-            isAuthenticated: true,
-        }),
 
-    // Clear user after logout
-    
-    logout: () => // Clears the store after logout.
-        set({
-            user: null,
-            isAuthenticated: false,
-        }),
+            user,
 
-    // Loading state
-    setLoading: (status) => //Updates the loading state.
+            isAuthenticated:true,
+
+            isLoading:false
+
+        });
+
+
+    },
+
+
+
+
+
+
+
+    setUser:(user)=>{
+
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
+
+
+
         set({
-            loading: status,
-        }),
+
+            user,
+
+            isAuthenticated:true
+
+        });
+
+
+    },
+
+
+
+
+
+
+
+    logout:async()=>{
+
+
+        try{
+
+
+            await logoutService();
+
+
+        }
+        catch(error){
+
+
+            console.log(
+                "Logout error:",
+                error
+            );
+
+
+        }
+        finally{
+
+
+            localStorage.removeItem("user");
+
+
+
+            set({
+
+                user:null,
+
+                isAuthenticated:false,
+
+                isLoading:false
+
+            });
+
+
+        }
+
+
+    }
+
+
 
 }));
+
 
 export default useAuthStore;

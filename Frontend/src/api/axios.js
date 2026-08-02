@@ -6,6 +6,9 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
+
+    timeout: 10000,
+    
 });
 
 
@@ -20,42 +23,54 @@ const api = axios.create({
 
 api.interceptors.response.use(
 
-    (response) => response,
+    (response)=>response,
 
-    async (error) => {
+
+    async(error)=>{
+
 
         const originalRequest = error.config;
 
-        // Access token expired
-        if (
+
+        if(
             error.response?.status === 401 &&
-            !originalRequest._retry
-        ) {
+            !originalRequest._retry &&
+            !originalRequest.url.includes("/profile") &&
+            !originalRequest.url.includes("/login") &&
+            !originalRequest.url.includes("/signup")
+        ){
 
-            originalRequest._retry = true;
 
-            try {
+            originalRequest._retry=true;
 
-                // Create new access token
+
+            try{
+
+
                 await api.post("/refresh-token");
 
-                // Retry original request
+
                 return api(originalRequest);
 
-            } catch (refreshError) {
 
-                // Refresh token expired
-                localStorage.clear();
-                sessionStorage.clear();
+            }
+            catch(refreshError){
 
-                window.location.href = "/login";
 
                 return Promise.reject(refreshError);
+
+
             }
+
         }
 
+
+
         return Promise.reject(error);
+
+
     }
+
 );
 
 export default api;

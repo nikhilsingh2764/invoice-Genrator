@@ -84,3 +84,26 @@ export const forgotPasswordSchema = z
             message: "Passwords do not match",
         }
     );
+
+
+
+export const resetPasswordSchema = z
+    .object({
+
+        password: z
+            .string()
+            .min(8, "Password must be at least 8 characters")
+            .max(50, "Password cannot exceed 50 characters"),
+
+
+        confirmPassword: z
+            .string(),
+
+    })
+    .refine(
+        (data) => data.password === data.confirmPassword,
+        {
+            path: ["confirmPassword"],
+            message: "Passwords do not match",
+        }
+    );
