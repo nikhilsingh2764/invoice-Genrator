@@ -6,16 +6,8 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-
-    timeout: 10000,
-    
+    timeout: 60000,
 });
-
-
-// Creates a reusable Axios instance. prevent repeating baseURL, headers and configuration in every API-call
-////Sends cookies automatically with every request.
-//// Sets default HTTP headers for every request. //saying to backend we are sending JSON
-
 
 // ==============================
 // Response Interceptor
@@ -23,51 +15,57 @@ const api = axios.create({
 
 api.interceptors.response.use(
 
-    (response)=>response,
+    (response) => response,
 
-
-    async(error)=>{
-
+    async (error) => {
 
         const originalRequest = error.config;
 
+        // If there is no response from server
+        if (!error.response) {
+            return Promise.reject(error);
+        }
 
-        if(
-            error.response?.status === 401 &&
-            !originalRequest._retry &&
-            !originalRequest.url.includes("/profile") &&
-            !originalRequest.url.includes("/login") &&
-            !originalRequest.url.includes("/signup")
-        ){
+        // Don't try to refresh for these routes
+        if (
+            originalRequest.url.includes("/refresh-token") ||
+            originalRequest.url.includes("/login") ||
+            originalRequest.url.includes("/signup")
+        ) {
+            return Promise.reject(error);
+        }
 
+        // Access token expired
+        if (
+            error.response.status === 401 &&
+            !originalRequest._retry
+        ) {
 
-            originalRequest._retry=true;
+            originalRequest._retry = true;
 
+            try {
 
-            try{
-
-
+                // Get new access token
                 await api.post("/refresh-token");
 
-
+                // Retry original request
                 return api(originalRequest);
 
+            } catch (refreshError) {
 
-            }
-            catch(refreshError){
+                // Refresh token also expired
 
+                localStorage.clear();
+
+                window.location.href = "/login";
 
                 return Promise.reject(refreshError);
-
 
             }
 
         }
 
-
-
         return Promise.reject(error);
-
 
     }
 

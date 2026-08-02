@@ -1,25 +1,29 @@
 import { Navigate } from "react-router-dom";
-import useAuthStore from "../store/auth.store";
+
 import Loader from "../components/common/Loader";
 
+import useAuthStore from "../store/auth.store";
 
 function ProtectedRoute({ children }) {
 
-    const {
-        isAuthenticated,
-        isLoading
-    } = useAuthStore();
+    const isAuthenticated = useAuthStore(
+        (state) => state.isAuthenticated
+    );
 
+    const isLoading = useAuthStore(
+        (state) => state.isLoading
+    );
 
     if (isLoading) {
-        return <Loader fullScreen />;
-    }
 
+        return <Loader fullScreen />;
+
+    }
 
     if (!isAuthenticated) {
 
         return (
-            <Navigate 
+            <Navigate
                 to="/login"
                 replace
             />
@@ -27,10 +31,8 @@ function ProtectedRoute({ children }) {
 
     }
 
-
     return children;
 
 }
-
 
 export default ProtectedRoute;

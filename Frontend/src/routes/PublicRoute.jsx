@@ -1,20 +1,38 @@
 import { Navigate } from "react-router-dom";
 
-import useAuthStore from "../store/auth.store";
 import Loader from "../components/common/Loader";
 
+import useAuthStore from "../store/auth.store";
+
 function PublicRoute({ children }) {
-  const { isAuthenticated, isLoading } = useAuthStore();
 
-  if (isLoading) {
-    return <Loader fullScreen />;
-  }
+    const isAuthenticated = useAuthStore(
+        (state) => state.isAuthenticated
+    );
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
+    const isLoading = useAuthStore(
+        (state) => state.isLoading
+    );
 
-  return children;
+    if (isLoading) {
+
+        return <Loader fullScreen />;
+
+    }
+
+    if (isAuthenticated) {
+
+        return (
+            <Navigate
+                to="/dashboard"
+                replace
+            />
+        );
+
+    }
+
+    return children;
+
 }
 
 export default PublicRoute;

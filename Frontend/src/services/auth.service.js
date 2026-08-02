@@ -1,7 +1,9 @@
 import api from "../api/axios";
 
+// ==========================
+// Authentication API Endpoints
+// ==========================
 
-// Authentication API endpoints.
 const AUTH_ENDPOINTS = {
 
     LOGIN: "/login",
@@ -20,12 +22,11 @@ const AUTH_ENDPOINTS = {
 
     CHANGE_PASSWORD: "/change-password",
 
-    UPDATE_PROFILE: "/Update-Profile",
+    UPDATE_PROFILE: "/update-profile",
 
     DEACTIVATE_ACCOUNT: "/deactivate-account",
 
     DELETE_ACCOUNT: "/delete-account",
-
 
 };
 
@@ -44,7 +45,6 @@ export const signup = async (data) => {
 
 };
 
-
 // ==========================
 // Verify Signup OTP
 // ==========================
@@ -59,7 +59,6 @@ export const verifyOtp = async (data) => {
     return response.data;
 
 };
-
 
 // ==========================
 // Login
@@ -76,7 +75,6 @@ export const login = async (data) => {
 
 };
 
-
 // ==========================
 // Logout
 // ==========================
@@ -91,9 +89,22 @@ export const logout = async () => {
 
 };
 
+// ==========================
+// Get Logged In User Profile
+// ==========================
+
+export const getProfile = async () => {
+
+    const response = await api.get(
+        AUTH_ENDPOINTS.PROFILE
+    );
+
+    return response.data;
+
+};
 
 // ==========================
-// Forgot Password (Send OTP)
+// Forgot Password
 // ==========================
 
 export const forgotPassword = async (data) => {
@@ -106,7 +117,6 @@ export const forgotPassword = async (data) => {
     return response.data;
 
 };
-
 
 // ==========================
 // Reset Password
@@ -123,15 +133,30 @@ export const resetPassword = async (data) => {
 
 };
 
+// ==========================
+// Change Password
+// ==========================
+
+export const changePassword = async (data) => {
+
+    const response = await api.patch(
+        AUTH_ENDPOINTS.CHANGE_PASSWORD,
+        data
+    );
+
+    return response.data;
+
+};
 
 // ==========================
-// show profile
+// Update Profile
 // ==========================
 
-export const getProfile = async () => {
+export const updateProfile = async (data) => {
 
-    const response = await api.get(
-        AUTH_ENDPOINTS.PROFILE,
+    const response = await api.patch(
+        AUTH_ENDPOINTS.UPDATE_PROFILE,
+        data
     );
 
     return response.data;
@@ -143,51 +168,28 @@ export const getProfile = async () => {
 // ==========================
 
 export const deactivateAccount = async () => {
+
     const response = await api.patch(
-        AUTH_ENDPOINTS.DEACTIVATE_ACCOUNT,
+        AUTH_ENDPOINTS.DEACTIVATE_ACCOUNT
     );
 
     return response.data;
-};
 
+};
 
 // ==========================
 // Delete Account
 // ==========================
 
 export const deleteAccount = async (data) => {
+
     const response = await api.delete(
         AUTH_ENDPOINTS.DELETE_ACCOUNT,
         {
-            data
+            data,
         }
     );
 
     return response.data;
-};
 
-
-
-
-export const changePassword = async (data) => {
-
-    const response = await api.patch(
-        "/change-password",
-        data
-
-    );
-
-    return response.data;
-};
-
-
-
-
-export const updateProfile = async (data) => {
-    const response = await api.patch(
-        "/Update-Profile",
-        data
-    );
-
-    return response.data;
 };

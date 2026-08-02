@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 
 import { loginSchema } from "../../validation/auth.schema";
-import { login } from "../../services/auth.service";
+import { login,getProfile } from "../../services/auth.service";
 
 import useAuthStore from "../../store/auth.store";
 
@@ -52,76 +52,75 @@ function Login() {
 
 
 
+const onSubmit = async (data) => {
 
-    const onSubmit = async(data)=>{
+    try {
 
+        // Login (Backend sets accessToken & refreshToken cookies)
+        const loginResponse = await login(data);
 
-        try{
+        // Fetch logged-in user
+        const profileResponse = await getProfile();
 
+        /*
+            Expected Profile Response
 
-            const response = await login(data);
-
-
-
-            /*
-                Backend response example:
-
-                {
-                    message:"Login successful",
-                    data:{
-                        user:{}
-                    }
+            {
+                statusCode: 200,
+                message: "...",
+                data: {
+                    user
                 }
+            }
 
-            */
+            OR
 
+            {
+                statusCode: 200,
+                message: "...",
+                data: user
+            }
 
-            loginUser(
-                response.data.user
-            );
+            Check your backend response and use the correct one.
+        */
 
+        loginUser(
+            profileResponse.data
+        );
 
+        toast.success(
+            loginResponse.message ||
+            "Login successful"
+        );
 
-            toast.success(
-                response.message ||
-                "Login successful"
-            );
+        navigate(
+            "/dashboard",
+            {
+                replace: true,
+            }
+        );
 
+    }
+    catch (error) {
 
+        console.log(
+            "Login error:",
+            error
+        );
 
-            navigate("/dashboard",{
-                replace:true
-            });
+        toast.error(
 
+            error.response?.data?.message ||
 
+            error.response?.data?.errors?.[0]?.msg ||
 
-        }
-        catch(error){
+            "Invalid email or password"
 
+        );
 
+    }
 
-            console.log(
-                "Login error:",
-                error
-            );
-
-
-
-            toast.error(
-
-                error.response?.data?.message ||
-
-                error.response?.data?.errors?.[0]?.msg ||
-
-                "Invalid email or password"
-
-            );
-
-
-        }
-
-
-    };
+};
 
 
 
