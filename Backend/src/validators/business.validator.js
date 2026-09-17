@@ -111,7 +111,7 @@ export const createBusinessValidator = [
                 .trim()
                 .notEmpty()
                 .withMessage("Postal code is required")
-                .matches(/^[1-9][0-9]{5}/)
+                .matches(/^[1-9][0-9]{5}$/)
                 .withMessage("Invalid postal code"),
 
 

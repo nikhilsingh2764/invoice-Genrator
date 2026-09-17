@@ -1,23 +1,13 @@
-### Signup - Send OTP
-
-POST http://localhost:8000/api/v1/signup
-Content-Type: application/json
-
-{
-    "username": "nikhilcdsdss",
-    "email": "nikhilsinghdfg@gmail.com",
-    "password": "dhn245dfgAA@"
-}
 
 
 ### Signup - Send OTP
 
-POST https://invoice-backend-drqr.onrender.com/api/v1/signup
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/signup
 Content-Type: application/json
 
 {
-    "username": "nikhilputess",
-    "email": "nikhilsinghdfg@gmail.com",
+    "username": "nikhilputsdss",
+    "email": "nikhilsingh11346@gmail.com",
     "password": "dhn245dfgAA@"
 }
 
@@ -45,8 +35,8 @@ POST http://localhost:8000/api/v1/Login
 Content-Type: application/json
 
 {
-    "email": "nikhilsinghd276@gmail.com",
-    "password": "dhn245dfgAA@"
+    "email": "dsss@gmail.com",
+    "password": "dhn245dfgA@"
 }
 
 ###
@@ -736,3 +726,25 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU
   "status": "Paid",
   "notes": "Third invoice"
 }
+
+
+
+
+##########################################################################################################
+
+
+
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU3MDMzMTQsImV4cCI6MTc4NTcwNjMxNH0.4hqiMPGoX7-gIUl-Lq7vZhlSzfsyand93u3woL6E7Z0
+
+
+### Dashboard - Full Data
+
+GET http://localhost:8000/api/v1/dashboard/
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU3MDMzMTQsImV4cCI6MTc4NTcwNjMxNH0.4hqiMPGoX7-gIUl-Lq7vZhlSzfsyand93u3woL6E7Z0
+
+
+
+### Search Invoice By Customer / Notes
+
+GET http://localhost:8000/api/v1/dashboard/?search=Rahul
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmQ1MzJhZjU1OWQ4ZmFiYTQyZmQ1ZCIsImVtYWlsIjoiZHNzc0BnbWFpbC5jb20iLCJpYXQiOjE3ODU3MDMzMTQsImV4cCI6MTc4NTcwNjMxNH0.4hqiMPGoX7-gIUl-Lq7vZhlSzfsyand93u3woL6E7Z0

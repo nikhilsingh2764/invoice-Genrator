@@ -1,92 +1,118 @@
 import ApiError from '../../utils/ApiError.js';
 import bcrypt from 'bcrypt';
-import redis from "../../config/redis.js"
+import redis from "../../config/redis.js";
 
 import userRepository from '../../repository/auth/user.repository.js';
-import otpRepository from "../../repository/auth/otp.repository.js";
 import refreshTokenRepository from "../../repository/auth/refreshToken.repository.js";
 
 import sendEmail from "./email.service.js";
-import sendOTPService from "./otp.service.js"
-
+import sendOTPService from "./otp.service.js";
 
 import generateToken from "../../utils/generateToken.js";
-import generateOTP from '../../utils/generateOTP.js';
 
 import welcomeTemplate from "../../templates/welcome.template.js";
-import otpTemplate from '../../templates/otp.template.js';
-import resetPasswordTemplate from "../../templates/resetPassword.template.js";
 
+import translate from '../../utils/translate.js';
+import logger from '../../utils/logger.js';
 
 
 const SALT_ROUNDS = 10;
 
-export const SignupService = async (userdata) => {
+
+// =========================
+// SIGNUP
+// =========================
+
+export const SignupService = async (userdata, language = "en") => {
 
     let { username, email, password } = userdata;
 
-
-    //sanitize data
+    // Sanitize data
     username = username.trim();
     email = email.trim().toLowerCase();
 
 
-
-    // Business Logic
-
+    // Check email exists
     const emailExist = await userRepository.emailExist(email);
 
     if (emailExist) {
-        throw new ApiError(409, "Email already exists");
+        throw new ApiError(
+            409,
+            translate("AUTH.EMAIL_ALREADY_EXISTS", language)
+        );
     }
 
+
+    // Check username exists
     const usernameExist = await userRepository.usernameExist(username);
 
     if (usernameExist) {
-        throw new ApiError(409, "Username already exists");
+        throw new ApiError(
+            409,
+            translate("AUTH.USERNAME_ALREADY_EXISTS", language)
+        );
     }
 
-    //generate OPT and save opt with temporary signup data in db and send opt to client email
-    await sendOTPService({ username, email, password, type: "EMAIL_VERIFICATION" })
 
-
-    //return response to controller
-    return {
-        email
-    }
-
-}
-
-
-export const VerifyOTPService = async ({ email, otp }) => {
-
-    const otpData = await otpRepository.findByEmailAndType(
+    // Generate OTP, save signup data and queue email
+    await sendOTPService({
+        username,
         email,
-        "EMAIL_VERIFICATION"
+        password,
+        type: "EMAIL_VERIFICATION"
+    });
+
+
+    logger.info(
+        `Signup OTP generated and email queued for: ${email}`
     );
 
 
-    if (!otpData) {
-        throw new ApiError(400, "Invalid OTP");
+    return {
+        email
+    };
+};
+
+
+// =========================
+// VERIFY OTP
+// =========================
+
+export const VerifyOTPService = async ({ email, otp }, language = "en") => {
+
+    email = email.trim().toLowerCase();
+
+    const key = `otp:EMAIL_VERIFICATION:${email}`;
+
+    const data = await redis.get(key);
+
+
+    if (!data) {
+        throw new ApiError(
+            400,
+            translate("AUTH.OTP_EXPIRED", language)
+        );
     }
 
 
-    if (otpData.expiresAt < new Date()) {
+    const otpData = JSON.parse(data);
 
-        await otpRepository.deleteById(otpData._id);
 
-        throw new ApiError(400, "OTP has expired");
+    // Verify OTP
+    if (otpData.otp !== String(otp)) {
 
+        logger.warn(
+            `Invalid email verification OTP attempt: ${email}`
+        );
+
+        throw new ApiError(
+            400,
+            translate("AUTH.INVALID_OTP", language)
+        );
     }
 
 
-    if (String(otpData.otp) !== String(otp)) {
-
-        throw new ApiError(400, "Invalid OTP");
-
-    }
-
-
+    // Create user
     const user = await userRepository.create({
         email: otpData.email,
         username: otpData.username,
@@ -95,24 +121,34 @@ export const VerifyOTPService = async ({ email, otp }) => {
     });
 
 
-    await otpRepository.deleteById(otpData._id);
+    logger.info(
+        `User created successfully: ${user._id}`
+    );
 
 
+    // Delete OTP
+    await redis.del(key);
+
+
+    // Send welcome email
     await sendEmail({
         to: user.email,
-        subject: "successful verification",
+        subject: "Successful verification",
         html: welcomeTemplate(user.username)
     });
 
 
     return user;
-
 };
 
-export const LoginService = async (userdata) => {
+
+// =========================
+// LOGIN
+// =========================
+
+export const LoginService = async (userdata, language = "en") => {
 
     let { email, password } = userdata;
-
 
     // Sanitize email
     email = email.trim().toLowerCase();
@@ -124,123 +160,94 @@ export const LoginService = async (userdata) => {
 
     if (!user) {
 
-        throw new ApiError(
-            400,
-            "Invalid email or password"
+        logger.warn(
+            `Login failed - user not found: ${email}`
         );
 
+        throw new ApiError(
+            400,
+            translate("AUTH.INVALID_PASSWORD", language)
+        );
     }
-
 
 
     // Check email verification
-
     if (!user.isVerified) {
+
+        logger.warn(
+            `Login attempted with unverified account: ${email}`
+        );
 
         throw new ApiError(
             400,
-            "Please verify your email"
+            translate("AUTH.EMAIL_NOT_VERIFIED", language)
         );
-
     }
-
 
 
     // Check account active
-
     if (!user.isActive) {
+
+        logger.warn(
+            `Login attempted with inactive account: ${user._id}`
+        );
 
         throw new ApiError(
             400,
-            "Account is deactivated"
+            translate("AUTH.ACCOUNT_INACTIVE", language)
         );
-
     }
-
-
-
-    // Check account lock
-
-    if (
-        user.lockUntil &&
-        user.lockUntil > new Date()
-    ) {
-
-        throw new ApiError(
-            403,
-            "Account temporarily locked. Try again later"
-        );
-
-    }
-
 
 
     // Compare password
-
-    const isPasswordMatch =
-        await bcrypt.compare(
-            password,
-            user.password
-        );
-
+    const isPasswordMatch = await bcrypt.compare(
+        password,
+        user.password
+    );
 
 
     // Wrong password
-
     if (!isPasswordMatch) {
-
 
         user.failedLoginAttempts += 1;
 
 
-
         // Lock account after 5 failed attempts
-
         if (user.failedLoginAttempts >= 5) {
-
 
             user.lockUntil =
                 new Date(
                     Date.now() + 15 * 60 * 1000
                 );
-
-
         }
-
 
 
         await userRepository.updateProfile(
             user._id,
             {
-                failedLoginAttempts:
-                    user.failedLoginAttempts,
-
-                lockUntil:
-                    user.lockUntil
+                failedLoginAttempts: user.failedLoginAttempts,
+                lockUntil: user.lockUntil
             }
         );
 
 
+        logger.warn(
+            `Login failed - incorrect password: ${user._id}`
+        );
+
 
         throw new ApiError(
             400,
-            "Invalid email or password"
+            translate("AUTH.INVALID_PASSWORD", language)
         );
-
     }
 
 
-
-
-    // Successful login
     // Reset failed attempts
-
-
     if (
         user.failedLoginAttempts > 0 ||
         user.lockUntil
     ) {
-
 
         await userRepository.updateProfile(
             user._id,
@@ -249,47 +256,31 @@ export const LoginService = async (userdata) => {
                 lockUntil: null
             }
         );
-
     }
 
 
-
-
     // Generate Access Token
-
     const accessToken = generateToken(
-
         {
             id: user._id,
             email: user.email
         },
-
         process.env.ACCESS_TOKEN_SECRET,
-
         process.env.ACCESS_TOKEN_EXPIRES_IN
-
     );
-
-
 
 
     // Generate Refresh Token
-
     const refreshToken = generateToken(
-
         {
             id: user._id
         },
-
         process.env.REFRESH_TOKEN_SECRET,
-
         process.env.REFRESH_TOKEN_EXPIRES_IN
-
     );
 
-    console.log(accessToken)
-    console.log("refreshToken :", refreshToken)
 
+    // NEVER console.log tokens
     await refreshTokenRepository.create({
 
         userId: user._id,
@@ -299,63 +290,91 @@ export const LoginService = async (userdata) => {
         expiresAt: new Date(
             Date.now() + 15 * 24 * 60 * 60 * 1000
         )
-
     });
 
+
+    logger.info(
+        `User logged in successfully: ${user._id}`
+    );
 
 
     return {
 
         user: {
-
             email: user.email,
-
             username: user.username,
-
             id: user._id
-
         },
-
 
         accessToken,
 
         refreshToken
-
     };
-
-
 };
 
 
-export const ProfileService = async (userId) => {
+// =========================
+// PROFILE
+// =========================
+
+export const ProfileService = async (
+    userId,
+    language = "en"
+) => {
 
     const cachekey = `profile:${userId}`;
+
     const cacheProfile = await redis.get(cachekey);
 
+
     if (cacheProfile) {
-        return JSON.parse(cacheProfile)
+
+        logger.info(
+            `Profile cache hit: ${userId}`
+        );
+
+        return JSON.parse(cacheProfile);
     }
 
 
-    //find user using ID
+    logger.info(
+        `Profile cache miss: ${userId}`
+    );
+
+
     const user = await userRepository.findById(userId);
 
+
     if (!user) {
-        throw new ApiError(404, "user not exist")
+
+        logger.warn(
+            `Profile not found: ${userId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate("AUTH.USER_NOT_FOUND", language)
+        );
     }
 
-    //return profile data
+
     const profile = {
 
         id: user._id,
-        username: user.username,
-        email: user.email,
-        isVerified: user.isVerified,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
 
-    }
+        username: user.username,
+
+        email: user.email,
+
+        isVerified: user.isVerified,
+
+        isActive: user.isActive,
+
+        createdAt: user.createdAt,
+
+        updatedAt: user.updatedAt
+    };
+
 
     await redis.set(
         cachekey,
@@ -364,179 +383,306 @@ export const ProfileService = async (userId) => {
         300
     );
 
-    return profile;
 
+    logger.info(
+        `Profile fetched from database and cached: ${userId}`
+    );
+
+
+    return profile;
 };
 
 
+// =========================
+// LOGOUT
+// =========================
 
-export const LogoutService = async (refreshToken) => {
+export const LogoutService = async (
+    refreshToken,
+    language = "en"
+) => {
 
-
-    // Remove refresh token from database
     if (refreshToken) {
 
         await refreshTokenRepository.deleteByToken(
             refreshToken
         );
-
     }
 
 
-    return null;
+    logger.info(
+        `User logged out successfully`
+    );
 
+
+    return null;
 };
 
 
+// =========================
+// UPDATE PROFILE
+// =========================
 
-export const UpdateProfileService = async (userId, data) => {
+export const UpdateProfileService = async (
+    userId,
+    data,
+    language = "en"
+) => {
 
     const { username } = data;
 
 
-    // Check username exists
     if (username) {
 
-        const existingUser = await userRepository.findByUsername(username);
+        const existingUser =
+            await userRepository.findByUsername(username);
 
-        // If username belongs to another user
-        if (existingUser && existingUser._id.toString() !== userId.toString()) {
-            throw new ApiError(400, "Username already exists");
+
+        if (
+            existingUser &&
+            existingUser._id.toString() !== userId.toString()
+        ) {
+
+            throw new ApiError(
+                400,
+                translate(
+                    "AUTH.USERNAME_ALREADY_EXISTS",
+                    language
+                )
+            );
         }
-
     }
 
 
-    // Update profile
-    const updatedUser = await userRepository.updateProfile(
-        userId,
-        {
-            username
-        }
-    );
+    const updatedUser =
+        await userRepository.updateProfile(
+            userId,
+            {
+                username
+            }
+        );
 
 
     if (!updatedUser) {
-        throw new ApiError(404, "User not found");
+
+        throw new ApiError(
+            404,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
     }
 
 
     // Remove old Redis cache
-    await redis.del(`profile:${userId}`);
+    await redis.del(
+        `profile:${userId}`
+    );
 
 
-    // Return safe user data
+    logger.info(
+        `User profile updated successfully: ${userId}`
+    );
+
+
     return {
+
         id: updatedUser._id,
+
         username: updatedUser.username,
+
         email: updatedUser.email,
+
         isVerified: updatedUser.isVerified,
+
         isActive: updatedUser.isActive,
+
         createdAt: updatedUser.createdAt,
+
         updatedAt: updatedUser.updatedAt
     };
-
 };
 
 
+// =========================
+// FORGOT PASSWORD
+// =========================
 
-export const ForgotPasswordService = async (email) => {
+export const ForgotPasswordService = async (
+    email,
+    language = "en"
+) => {
 
-    // Sanitize email
     email = email.trim().toLowerCase();
 
-    //check user exists
-    const user = await userRepository.findByEmailWithoutPassword(email);
+
+    const user =
+        await userRepository.findByEmailWithoutPassword(email);
+
 
     if (!user) {
-        throw new ApiError(404, "user not found")
+
+        logger.warn(
+            `Password reset requested for unknown email: ${email}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
     }
+
 
     if (user.provider === "GOOGLE") {
 
-        throw new ApiError(
-            400,
-            "Google account does not support password reset. Please login with Google."
+        logger.warn(
+            `Password reset attempted for Google account: ${user._id}`
         );
 
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.GOOGLE_PASSWORD_RESET",
+                language
+            )
+        );
     }
 
-    //remove old password reset history from db
-    await otpRepository.deleteByEmailAndType(email, "PASSWORD_RESET");
 
+    await sendOTPService({
 
-    // Send new OTP
-    await sendOTPService({  //is a service take data and send otp and save otp data in otp-db
         email: user.email,
+
         type: "PASSWORD_RESET"
     });
 
+
+    logger.info(
+        `Password reset OTP queued: ${email}`
+    );
+
+
     return null;
+};
 
 
+// =========================
+// RESET PASSWORD
+// =========================
 
+export const ResetPasswordService = async (
+    { email, otp, newPassword },
+    language = "en"
+) => {
 
-}
-
-
-
-export const ResetPasswordService = async ({ email, otp, newPassword }) => {
-
-
-    // Validate input
     if (!email || !otp || !newPassword) {
+
         throw new ApiError(
             400,
-            "Email, OTP and new password are required"
+            translate(
+                "AUTH.PASSWORDS_REQUIRED",
+                language
+            )
         );
     }
 
-    // Sanitize email
+
     email = email.trim().toLowerCase();
 
-    // Find user
-    const user = await userRepository.findByEmailWithoutPassword(email);
+
+    const user =
+        await userRepository.findByEmailWithoutPassword(email);
+
 
     if (!user) {
-        throw new ApiError(404, "User not found");
+
+        logger.warn(
+            `Password reset attempted for unknown email: ${email}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
     }
+
 
     if (user.provider === "GOOGLE") {
 
-        throw new ApiError(
-            400,
-            "Google account does not support password reset"
+        logger.warn(
+            `Password reset attempted for Google account: ${user._id}`
         );
 
-    }
-
-    //find Otp
-    const otpdata = await otpRepository.findByEmailAndType(email, "PASSWORD_RESET")
-
-
-    if (!otpdata) {
-        throw new ApiError(400, "Invalid OTP");
-    }
-
-
-    // Check expiry
-    if (otpdata.expiresAt < new Date()) {
-        await otpRepository.deleteById(otpdata._id);
-        throw new ApiError(400, "OTP has expired");
-    }
-
-    //OPT verify
-    if (otpdata.otp !== otp) {
-        throw new ApiError(400, "Invalid  OTP");
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.GOOGLE_PASSWORD_RESET",
+                language
+            )
+        );
     }
 
 
-    // Hash new password
-    const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    const key =
+        `otp:PASSWORD_RESET:${email}`;
 
 
+    const data =
+        await redis.get(key);
 
-    //update password
+
+    if (!data) {
+
+        logger.warn(
+            `Password reset OTP expired or not found: ${user._id}`
+        );
+
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.INVALID_OTP",
+                language
+            )
+        );
+    }
+
+
+    const otpdata =
+        JSON.parse(data);
+
+
+    if (
+        otpdata.otp !== String(otp)
+    ) {
+
+        logger.warn(
+            `Invalid password reset OTP attempt: ${user._id}`
+        );
+
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.INVALID_OTP",
+                language
+            )
+        );
+    }
+
+
+    const hashedNewPassword =
+        await bcrypt.hash(
+            newPassword,
+            SALT_ROUNDS
+        );
+
+
     await userRepository.updateProfile(
         user._id,
         {
@@ -544,111 +690,251 @@ export const ResetPasswordService = async ({ email, otp, newPassword }) => {
         }
     );
 
-    // Delete OTP after successful reset
-    await otpRepository.deleteById(otpdata._id);
+
+    await redis.del(key);
+
+
+    logger.info(
+        `Password reset successfully: ${user._id}`
+    );
+
 
     return null;
-
-}
-
-
-
-export const updatePasswordService = async (id, data) => {
-
-    const { oldPassword, newPassword } = data;
-
-    if (!newPassword || !oldPassword) {
-        throw new ApiError(400, "Old password and new password are required");
-    }
-
-    //Find user with password
-    const user = await userRepository.findByIdWithPassword(id)
-
-    if (!user) {
-        throw new ApiError(400, "User not found");
-    }
-
-    //compare old password
-    const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
-
-    if (!isPasswordCorrect) {
-        throw new ApiError(401, "Old password is incorrect");
-
-    }
-
-    //hash new password
-
-    const newHashedPassword = await bcrypt.hash(newPassword, 10)
-
-    //update password in DB
-    await userRepository.updateProfile(id, { password: newHashedPassword })
-
-    return null;
-
 };
 
 
+// =========================
+// UPDATE PASSWORD
+// =========================
+
+export const updatePasswordService = async (
+    id,
+    data,
+    language = "en"
+) => {
+
+    const {
+        oldPassword,
+        newPassword
+    } = data;
 
 
-export const DeactivateAccountService = async (id) => {
+    if (
+        !newPassword ||
+        !oldPassword
+    ) {
 
-    //check user exist
-    const user = await userRepository.findById(id);
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.PASSWORDS_REQUIRED",
+                language
+            )
+        );
+    }
+
+
+    const user =
+        await userRepository.findByIdWithPassword(id);
+
 
     if (!user) {
-        throw new ApiError(404, "User not exist")
+
+        logger.warn(
+            `Password update attempted for unknown user: ${id}`
+        );
+
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
     }
 
-    console.log("accoynt is", user.isActive);
 
-    //check already de-activate
+    const isPasswordCorrect =
+        await bcrypt.compare(
+            oldPassword,
+            user.password
+        );
+
+
+    if (!isPasswordCorrect) {
+
+        logger.warn(
+            `Incorrect old password during password update: ${id}`
+        );
+
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.OLD_PASSWORD_INCORRECT",
+                language
+            )
+        );
+    }
+
+
+    const newHashedPassword =
+        await bcrypt.hash(
+            newPassword,
+            SALT_ROUNDS
+        );
+
+
+    await userRepository.updateProfile(
+        id,
+        {
+            password: newHashedPassword
+        }
+    );
+
+
+    logger.info(
+        `Password updated successfully: ${id}`
+    );
+
+
+    return null;
+};
+
+
+// =========================
+// DEACTIVATE ACCOUNT
+// =========================
+
+export const DeactivateAccountService = async (
+    id,
+    language = "en"
+) => {
+
+    const user =
+        await userRepository.findById(id);
+
+
+    if (!user) {
+
+        logger.warn(
+            `Account deactivation attempted for unknown user: ${id}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
+    }
+
+
     if (!user.isActive) {
-        throw new ApiError(400, "Account is already deactivated");
+
+        logger.warn(
+            `Account already deactivated: ${id}`
+        );
+
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.ACCOUNT_ALREADY_DEACTIVATED",
+                language
+            )
+        );
     }
 
-    //De-Activate account
+
     await userRepository.deactivateAccount(id);
 
+
+    logger.info(
+        `Account deactivated successfully: ${id}`
+    );
+
+
     return null;
-
-}
-
-
-
-
-export const DeleteAccountService = async (id, password) => {
-
-    // Check password is provided
-    if (!password) {
-        throw new ApiError(400, "Password is required");
-    }
-
-    //find user exist
-    const user = await userRepository.findByIdWithPassword(id);
-
-    if (!user) {
-        throw new ApiError(400, "user not found")
-    }
-
-
-    // Verify password 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-
-    if (!isPasswordCorrect) {
-        throw new ApiError(401, "Invalid password");
-    }
-
-
-    //delete account
-    await userRepository.findByIdAndDelete(id);
-
-    await redis.del(`profile:${id}`);
-    
-    return null;
-
-
 };
 
 
-//note pass {} when multiple parameters are there
+// =========================
+// DELETE ACCOUNT
+// =========================
+
+export const DeleteAccountService = async (
+    id,
+    password,
+    language = "en"
+) => {
+
+    if (!password) {
+
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.PASSWORD_REQUIRED",
+                language
+            )
+        );
+    }
+
+
+    const user =
+        await userRepository.findByIdWithPassword(id);
+
+
+    if (!user) {
+
+        logger.warn(
+            `Account deletion attempted for unknown user: ${id}`
+        );
+
+        throw new ApiError(
+            400,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
+    }
+
+
+    const isPasswordCorrect =
+        await bcrypt.compare(
+            password,
+            user.password
+        );
+
+
+    if (!isPasswordCorrect) {
+
+        logger.warn(
+            `Invalid password during account deletion: ${id}`
+        );
+
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.INVALID_PASSWORD",
+                language
+            )
+        );
+    }
+
+
+    await userRepository.findByIdAndDelete(id);
+
+
+    await redis.del(
+        `profile:${id}`
+    );
+
+
+    logger.info(
+        `Account deleted successfully: ${id}`
+    );
+
+
+    return null;
+};

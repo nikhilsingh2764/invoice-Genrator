@@ -1,75 +1,118 @@
-import bcrypt from 'bcrypt';
-import otpRepository from '../../repository/auth/otp.repository.js';
-import generateOTP from '../../utils/generateOTP.js';
-import sendEmail from './email.service.js';
-import otpTemplate from '../../templates/otp.template.js';
+import bcrypt from "bcrypt";
+import generateOTP from "../../utils/generateOTP.js";
+
+import otpTemplate from "../../templates/otp.template.js";
 import resetPasswordTemplate from "../../templates/resetPassword.template.js";
-import userRepository from '../../repository/auth/user.repository.js';
+
+import redis from "../../config/redis.js";
+import logger from "../../utils/logger.js";
+
+import { emailQueue } from "../../queues/email.queue.js";
+
+import translate from "../../utils/translate.js";
+
 
 const SALT_ROUNDS = 10;
 
 
-const sendOTPService = async ({ username=null, email, password=null, type }) => {
+const sendOTPService = async ({
+    username = null,
+    email,
+    password = null,
+    type,
+    language = "en"
+}) => {
 
-
-    //Hash password
-
+    // Hash password
     let hashedPassword = null;
 
     // Hash password only for signup
     if (type === "EMAIL_VERIFICATION") {
-        hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        hashedPassword = await bcrypt.hash(
+            password,
+            SALT_ROUNDS
+        );
     }
 
-    //generate 6-digit OPT
+
+    // Generate 6-digit OTP
     const otp = generateOTP();
-    console.log("OTP IS:",otp);
 
-    
-    //OPT expires in 10 min
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); //10 min
+    // NEVER log OTP
+    // console.log(otp);
 
-    //remove all old opt from this email
-    await otpRepository.deleteByEmailAndType(email, type);
 
-    // Save temporary signup data
-    await otpRepository.create({
-        username,
-        email,
-        password: hashedPassword,
+    // Store OTP in Redis with expiry
+    const key = `otp:${type}:${email}`;
+
+    const otpData = {
         otp,
-        expiresAt,
+        email,
+        username,
+        password: hashedPassword,
         type
-    })
+    };
 
 
-    //send to client email
+    await redis.set(
+        key,
+        JSON.stringify(otpData),
+        "EX",
+        300
+    );
+
+
+    // Prepare email
+    let subject;
+    let html;
+
 
     if (type === "EMAIL_VERIFICATION") {
 
-        await sendEmail({
-            to: email,
-            subject: "Verify Your Email",
-            html: otpTemplate(username, otp)
-        });
+        subject = translate(
+            "AUTH.EMAIL_VERIFICATION_SUBJECT",
+            language
+        );
+
+        html = otpTemplate(
+            username,
+            otp,
+            language
+        );
 
     } else if (type === "PASSWORD_RESET") {
 
-        await sendEmail({
-            to: email,
-            subject: "Reset Your Password",
-            html: resetPasswordTemplate(otp)
-        });
+        subject = translate(
+            "AUTH.PASSWORD_RESET_SUBJECT",
+            language
+        );
 
+        html = resetPasswordTemplate(
+            otp,
+            language
+        );
     }
 
 
+    // Add email job to BullMQ
+    await emailQueue.add(
+        "send-email",
+        {
+            to: email,
+            subject,
+            html,
+            language
+        }
+    );
+
+
+    logger.info(
+        `OTP generated and email queued: ${type}`
+    );
+
 
     return null;
-
 };
 
+
 export default sendOTPService;
-
-//opt+data save in db and opt send to client email next is opt verify
-

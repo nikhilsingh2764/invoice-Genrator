@@ -1,5 +1,6 @@
 import ApiResponse from "../../utils/ApiResponse.js";
 import TryCatch from "../../middleware/TryCatch.js";
+import translate from "../../utils/translate.js";
 
 import {
     createProductService,
@@ -15,17 +16,26 @@ import {
 export const createProduct = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
-    const productData = req.body;
 
-    productData.userId  = userId;
+    const productData = {
+        ...req.body,
+        userId
+    };
 
-    const product = await createProductService(productData);
-  
-    console.log(product)
+
+    const product = await createProductService(
+        productData,
+        req.language
+    );
+
+
     return res.status(201).json(
         new ApiResponse(
             201,
-            "Product created successfully",
+            translate(
+                "PRODUCT.PRODUCT_CREATED",
+                req.language
+            ),
             product
         )
     );
@@ -39,13 +49,19 @@ export const getAllProducts = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
 
-    const products = await getAllProductsService(userId);
+    const products = await getAllProductsService(
+        userId,
+        req.language
+    );
 
-    console.log(products)
+
     return res.status(200).json(
         new ApiResponse(
             200,
-            "All products fetched successfully",
+            translate(
+                "PRODUCT.PRODUCTS_FETCHED",
+                req.language
+            ),
             products
         )
     );
@@ -57,15 +73,27 @@ export const getAllProducts = TryCatch(async (req, res) => {
 // Get Product By ID
 export const getProductById = TryCatch(async (req, res) => {
 
-    const { id: productId } = req.params;
+    const userId = req.user._id;
 
-    const product = await getProductByIdService(productId);
-    console.log(product)
+    const {
+        id: productId
+    } = req.params;
+
+
+    const product = await getProductByIdService(
+        productId,
+        userId,
+        req.language
+    );
+
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            "Product fetched successfully",
+            translate(
+                "PRODUCT.PRODUCT_FETCHED",
+                req.language
+            ),
             product
         )
     );
@@ -77,21 +105,31 @@ export const getProductById = TryCatch(async (req, res) => {
 // Update Product
 export const updateProduct = TryCatch(async (req, res) => {
 
-    const { id: productId } = req.params;
+    const userId = req.user._id;
+
+    const {
+        id: productId
+    } = req.params;
+
     const updateData = req.body;
 
-    const updatedProduct = await updateProductService(
-        productId,
-        updateData
-    );
 
-        console.log(updatedProduct)
+    const updatedProduct =
+        await updateProductService(
+            productId,
+            userId,
+            updateData,
+            req.language
+        );
 
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            "Product updated successfully",
+            translate(
+                "PRODUCT.PRODUCT_UPDATED",
+                req.language
+            ),
             updatedProduct
         )
     );
@@ -103,14 +141,27 @@ export const updateProduct = TryCatch(async (req, res) => {
 // Delete Product
 export const deleteProduct = TryCatch(async (req, res) => {
 
-    const { id: productId } = req.params;
+    const userId = req.user._id;
 
-    await deleteProductService(productId);
+    const {
+        id: productId
+    } = req.params;
+
+
+    await deleteProductService(
+        productId,
+        userId,
+        req.language
+    );
+
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            "Product deleted successfully",
+            translate(
+                "PRODUCT.PRODUCT_DELETED",
+                req.language
+            ),
             null
         )
     );

@@ -14,9 +14,9 @@ class CustomerRepository {
     }
 
 
-    // Get Customer By ID
-    async findById(customerId) {
-        return await Customer.findOne({ _id: customerId });
+    // Get Customer By ID + userId
+    async findByIdAndUserId(customerId, userId) {
+        return await Customer.findOne({ _id: customerId, userId });
     }
 
 
@@ -33,9 +33,12 @@ class CustomerRepository {
 
 
     // Update Customer
-    async updateById(customerId, updatedData) {
+    async updateByIdAndUserId(customerId, userId, updatedData) {
         return await Customer.findOneAndUpdate(
-            { _id: customerId },
+            {
+                _id: customerId,
+                userId
+            },
             updatedData,
             {
                 new: true,
@@ -46,8 +49,11 @@ class CustomerRepository {
 
 
     // Delete Customer
-    async deleteById(customerId) {
-        return await Customer.findOneAndDelete({ _id: customerId });
+    async deleteByIdAndUserId(customerId, userId) {
+        return await Customer.findOneAndDelete({
+            _id: customerId,
+            userId
+        });
     }
 
 }

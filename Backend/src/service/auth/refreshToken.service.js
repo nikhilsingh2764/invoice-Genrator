@@ -1,26 +1,37 @@
 import jwt from "jsonwebtoken";
+
+import logger from "../../utils/logger.js";
+import translate from "../../utils/translate.js";
+
 import ApiError from "../../utils/ApiError.js";
 import userRepository from "../../repository/auth/user.repository.js";
 import generateToken from "../../utils/generateToken.js";
 import refreshTokenRepository from "../../repository/auth/refreshToken.repository.js";
 
 
-const RefreshTokenService = async (refreshToken) => {
+const RefreshTokenService = async (
+    refreshToken,
+    language = "en"
+) => {
 
-
-    // Check refresh token exists
+    // 1. Check refresh token exists
     if (!refreshToken) {
+
+        logger.warn(
+            "Refresh token request failed: token missing"
+        );
+
         throw new ApiError(
             401,
-            "Refresh token is missing"
+            translate(
+                "AUTH.TOKEN_REQUIRED",
+                language
+            )
         );
     }
 
-    console.log("STEP 1 - refresh token received");
 
-
-
-    // Verify refresh token
+    // 2. Verify refresh token
     let decoded;
 
     try {
@@ -29,82 +40,91 @@ const RefreshTokenService = async (refreshToken) => {
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET
         );
-        console.log("STEP 2 - decoded:", decoded);
 
     } catch (error) {
-        console.log("JWT ERROR:", error.message);
+
+        logger.warn(
+            "Refresh token verification failed"
+        );
 
         throw new ApiError(
             401,
-            "Invalid refresh token"
+            translate(
+                "AUTH.INVALID_TOKEN",
+                language
+            )
         );
-
     }
 
 
+    // 3. Check refresh token exists in database
+    const storedToken =
+        await refreshTokenRepository.findByToken(
+            refreshToken
+        );
 
-    // Check token exists in database
-
-    console.log("Incoming token length:", refreshToken.length);
-
-
-    const storedToken = await refreshTokenRepository.findByToken(
-        refreshToken
-    );
-
-    console.log("STEP 3 - Stored Token:", storedToken);
 
     if (!storedToken) {
 
-        throw new ApiError(
-            401,
-            "Refresh token expired or revoked"
+        logger.warn(
+            `Refresh token revoked or expired: ${decoded.id}`
         );
 
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.TOKEN_EXPIRED",
+                language
+            )
+        );
     }
 
 
+    // 4. Find user
+    const user =
+        await userRepository.findById(decoded.id);
 
-    // Find user
-
-    const user = await userRepository.findById(decoded.id);
-
-    console.log("STEP 4 - User:", user);
 
     if (!user) {
 
-        throw new ApiError(
-            401,
-            "User not found"
+        logger.warn(
+            `Refresh token used for unknown user: ${decoded.id}`
         );
 
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                language
+            )
+        );
     }
 
 
-
-    // Check active account
-
+    // 5. Check account status
     if (!user.isActive) {
+
+        logger.warn(
+            `Refresh token used for inactive account: ${user._id}`
+        );
 
         throw new ApiError(
             403,
-            "Account is deactivated"
+            translate(
+                "AUTH.ACCOUNT_INACTIVE",
+                language
+            )
         );
-
     }
 
 
-
-    // Delete old refresh token
-
-  const deleted =  await refreshTokenRepository.deleteByToken(
+    // 6. Delete old refresh token
+    await refreshTokenRepository.deleteByToken(
         refreshToken
     );
 
-console.log("Deleted:", deleted);
 
-    // Generate new access token
-
+    // 7. Generate new access token
     const newAccessToken =
         generateToken(
             {
@@ -116,10 +136,7 @@ console.log("Deleted:", deleted);
         );
 
 
-
-
-    // Generate new refresh token
-
+    // 8. Generate new refresh token
     const newRefreshToken =
         generateToken(
             {
@@ -130,25 +147,32 @@ console.log("Deleted:", deleted);
         );
 
 
+    // 9. Calculate refresh token expiry
+    const refreshTokenExpiresAt =
+        new Date(
+            Date.now() +
+            15 * 24 * 60 * 60 * 1000
+        );
 
 
-    // Save new refresh token
-
+    // 10. Save new refresh token
     await refreshTokenRepository.create({
 
         userId: user._id,
 
         token: newRefreshToken,
 
-        expiresAt: new Date(
-            Date.now() +
-            15 * 24 * 60 * 60 * 1000
-        )
+        expiresAt: refreshTokenExpiresAt
 
     });
 
 
+    logger.info(
+        `Refresh token rotated successfully: ${user._id}`
+    );
 
+
+    // 11. Return new token pair
     return {
 
         newAccessToken,
@@ -156,7 +180,6 @@ console.log("Deleted:", deleted);
         newRefreshToken
 
     };
-
 
 };
 

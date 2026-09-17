@@ -1,12 +1,16 @@
 import { googleLoginService } from "../../service/auth/googleAuth.service.js";
 import ApiResponse from "../../utils/ApiResponse.js";
 import TryCatch from "../../middleware/TryCatch.js";
+import translate from "../../utils/translate.js";
 
 export const googleLoginController = TryCatch(async (req, res) => {
 
     const { idToken } = req.body;
 
-    const result = await googleLoginService(idToken);
+    const result = await googleLoginService(
+        idToken,
+        req.language
+    );
 
 
     res.cookie(
@@ -31,10 +35,13 @@ export const googleLoginController = TryCatch(async (req, res) => {
     );
 
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(
             200,
-            "Google Login Successful",
+            translate(
+                "AUTH.GOOGLE_LOGIN_SUCCESS",
+                req.language
+            ),
             result.user
         )
     );

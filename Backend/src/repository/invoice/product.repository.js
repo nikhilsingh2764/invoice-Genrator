@@ -15,14 +15,17 @@ class ProductRepository {
 
 
     // Get Product By ID
-    async findById(productId) {
-        return await Product.findOne({ _id: productId });
+    async findByIdAndUserId(productId, userId) {
+        return await Product.findOne({ _id: productId, userId });
     }
 
 
     // Get Product By Name
-    async findByName(productName) {
-        return await Product.findOne({ productName });
+    async findByName(productName, userId) {
+        return await Product.findOne({
+            productName,
+            userId
+        });
     }
 
 
@@ -32,10 +35,13 @@ class ProductRepository {
     }
 
 
-    // Update Product
-    async updateById(productId, updatedData) {
+    // Update Product By ID + userId
+    async updateByIdAndUserId(productId, userId, updatedData) {
         return await Product.findOneAndUpdate(
-            { _id: productId },
+            {
+                _id: productId,
+                userId
+            },
             updatedData,
             {
                 new: true,
@@ -44,10 +50,12 @@ class ProductRepository {
         );
     }
 
-
-    // Delete Product
-    async deleteById(productId) {
-        return await Product.findOneAndDelete({ _id: productId });
+    // Delete Product By ID + userId
+    async deleteByIdAndUserId(productId, userId) {
+        return await Product.findOneAndDelete({
+            _id: productId,
+            userId
+        });
     }
 
 }

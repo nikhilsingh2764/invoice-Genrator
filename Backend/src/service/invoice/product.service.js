@@ -1,73 +1,195 @@
-import ApiError from "../../utils/ApiError.js"
-import productRepository from "../../repository/invoice/product.repository.js"
+import ApiError from "../../utils/ApiError.js";
+import productRepository from "../../repository/invoice/product.repository.js";
+import logger from "../../utils/logger.js";
+import translate from "../../utils/translate.js";
 
 
 
-export const createProductService = async (productData) => {
+export const createProductService = async (
+    productData,
+    language = "en"
+) => {
 
-    const product = await productRepository.create(productData);
+    const product =
+        await productRepository.create(productData);
 
     if (!product) {
-        throw new ApiError(500, "product not created successfully")
+
+        logger.error(
+            `Product creation failed: ${productData.userId}`
+        );
+
+        throw new ApiError(
+            500,
+            translate(
+                "PRODUCT.PRODUCT_CREATE_FAILED",
+                language
+            )
+        );
     }
 
+
+    logger.info(
+        `Product created successfully: ${product._id}`
+    );
+
     return product;
+};
 
-}
 
-export const getAllProductsService = async (userId) => {
 
-    const products = await productRepository.findAll(userId);
+
+export const getAllProductsService = async (
+    userId,
+    language = "en"
+) => {
+
+    const products =
+        await productRepository.findAll(userId);
+
+    logger.info(
+        `Products fetched successfully: ${userId}`
+    );
 
     return products;
+};
 
-}
 
 
-export const getProductByIdService = async (productId) => {
 
-    const product = await productRepository.findById(productId);
+export const getProductByIdService = async (
+    productId,
+    userId,
+    language = "en"
+) => {
+
+    const product =
+        await productRepository.findByIdAndUserId(
+            productId,
+            userId
+        );
 
     if (!product) {
-        throw new ApiError(500, "product not found")
+
+        logger.warn(
+            `Product not found: ${productId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "PRODUCT.PRODUCT_NOT_FOUND",
+                language
+            )
+        );
     }
+
 
     return product;
+};
 
-}
 
-export const updateProductService = async (productId, updateData) => {
 
-    const productExist = await productRepository.existsById(productId);
 
-    if (!productExist) {
-        throw new ApiError(404, "product not found!")
+export const updateProductService = async (
+    productId,
+    userId,
+    updateData,
+    language = "en"
+) => {
 
+    const product =
+        await productRepository.findByIdAndUserId(
+            productId,
+            userId
+        );
+
+    if (!product) {
+
+        logger.warn(
+            `Product update attempted for non-existing product: ${productId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "PRODUCT.PRODUCT_NOT_FOUND",
+                language
+            )
+        );
     }
 
-    const updateProduct = await productRepository.updateById(productId, updateData);
 
-    if (!updateProduct) {
-        throw new ApiError(500, "product not updated successfully")
+    const updatedProduct =
+        await productRepository.updateByIdAndUserId(
+            productId,
+            userId,
+            updateData
+        );
+
+    if (!updatedProduct) {
+
+        logger.error(
+            `Product update failed: ${productId}`
+        );
+
+        throw new ApiError(
+            500,
+            translate(
+                "PRODUCT.PRODUCT_UPDATE_FAILED",
+                language
+            )
+        );
     }
 
-    return updateProduct;
+
+    logger.info(
+        `Product updated successfully: ${productId}`
+    );
+
+    return updatedProduct;
+};
 
 
-}
-
-export const deleteProductService = async (productId) => {
 
 
-    const productExist = await productRepository.existsById(productId);
+export const deleteProductService = async (
+    productId,
+    userId,
+    language = "en"
+) => {
 
-    if (!productExist) {
-        throw new ApiError(404, "product not found!")
+    const product =
+        await productRepository.findByIdAndUserId(
+            productId,
+            userId
+        );
 
+    if (!product) {
+
+        logger.warn(
+            `Product deletion attempted for non-existing product: ${productId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "PRODUCT.PRODUCT_NOT_FOUND",
+                language
+            )
+        );
     }
 
 
-    await productRepository.deleteById(productId);
+    await productRepository.deleteByIdAndUserId(
+        productId,
+        userId
+    );
+
+
+    logger.info(
+        `Product deleted successfully: ${productId}`
+    );
 
     return null;
-}
+};
