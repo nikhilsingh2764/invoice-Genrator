@@ -13,6 +13,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: Backend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,8 +26,20 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: Backend/package-lock.json
 
+      - name: Install dependencies
+        run: npm ci
 
-                - name: Deploy to Render
+      - name: Build Docker image
+        run: docker build -t invoice-api .
+
+      - name: Check Docker image
+        run: docker image inspect invoice-api
+
+      - name: Check Docker Compose
+        run: docker compose config
+
+      - name: Deploy to Render
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"

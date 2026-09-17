@@ -1,89 +1,137 @@
 import TryCatch from "../../middleware/TryCatch.js";
 import ApiResponse from "../../utils/ApiResponse.js";
-import { accessTokenOptions, refreshTokenOptions } from "../../utils/cookieOptions.js";
+import translate from "../../utils/translate.js";
+
+import {
+    accessTokenOptions,
+    refreshTokenOptions
+} from "../../utils/cookieOptions.js";
 
 
 import {
-    SignupService, LoginService, ProfileService, LogoutService, VerifyOTPService,
-    UpdateProfileService, ForgotPasswordService, ResetPasswordService,
-    updatePasswordService, DeactivateAccountService, DeleteAccountService
+    SignupService,
+    LoginService,
+    ProfileService,
+    LogoutService,
+    VerifyOTPService,
+    UpdateProfileService,
+    ForgotPasswordService,
+    ResetPasswordService,
+    updatePasswordService,
+    DeactivateAccountService,
+    DeleteAccountService
 } from "../../service/auth/auth.service.js";
 
 
 
 export const Signup = TryCatch(async (req, res) => {
 
-    const data = await SignupService(req.body);
-
-    return res.status(201)
-        .json(
-            new ApiResponse(
-                201,
-                'OTP sent successfully',
-                data
-            )
+    const data =
+        await SignupService(
+            req.body,
+            req.language
         );
 
+
+    return res.status(201).json(
+        new ApiResponse(
+            201,
+            translate(
+                "AUTH.OTP_SENT",
+                req.language
+            ),
+            data
+        )
+    );
 });
+
 
 
 export const VerifyOTP = TryCatch(async (req, res) => {
 
-    const data = await VerifyOTPService(req.body);
-
-    return res.status(201)
-        .json(
-            new ApiResponse(
-                201,
-                'Account created successfully',
-                data
-            )
+    const data =
+        await VerifyOTPService(
+            req.body,
+            req.language
         );
 
+
+    return res.status(201).json(
+        new ApiResponse(
+            201,
+            translate(
+                "AUTH.SIGNUP_SUCCESS",
+                req.language
+            ),
+            data
+        )
+    );
 });
 
 
 
 export const Login = TryCatch(async (req, res) => {
 
-    const { user, accessToken, refreshToken } = await LoginService(req.body);
-
-    //store tokens in res cookie
-    console.log("SETTING COOKIE");
-
-
-    res.cookie("accessToken", accessToken, accessTokenOptions);
-
-    res.cookie("refreshToken", refreshToken, refreshTokenOptions);
-
-
-    console.log("COOKIE HEADER:");
-    console.log(res.getHeaders()["set-cookie"]);
-
-
-    
-    return res.status(200).json(
-        new ApiResponse(200, "Login Successful", user)
+    const {
+        user,
+        accessToken,
+        refreshToken
+    } = await LoginService(
+        req.body,
+        req.language
     );
 
+
+    // Store tokens in cookies
+    res.cookie(
+        "accessToken",
+        accessToken,
+        accessTokenOptions
+    );
+
+    res.cookie(
+        "refreshToken",
+        refreshToken,
+        refreshTokenOptions
+    );
+
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            translate(
+                "AUTH.LOGIN_SUCCESS",
+                req.language
+            ),
+            user
+        )
+    );
 });
 
 
 
 export const Profile = TryCatch(async (req, res) => {
 
-    //get userId from auth middleware
     const userId = req.user._id;
 
 
-    //send userId to ProfileService
-    const user = await ProfileService(userId);
+    const user =
+        await ProfileService(
+            userId,
+            req.language
+        );
 
-    //send success response
-    res.status(200).json(
-        new ApiResponse(200, "Profile fetched successfully", user)
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            translate(
+                "PROFILE.PROFILE_FETCHED",
+                req.language
+            ),
+            user
+        )
     );
-
 });
 
 
@@ -91,22 +139,38 @@ export const Profile = TryCatch(async (req, res) => {
 export const Logout = TryCatch(async (req, res) => {
 
     // Get refresh token from cookie
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken =
+        req.cookies.refreshToken;
+
 
     // Remove refresh token from database
-    await LogoutService(refreshToken);
-
-
-    //clear access and refresh token from cookies
-    res.clearCookie("accessToken", accessTokenOptions);
-    res.clearCookie("refreshToken", refreshTokenOptions);
-
-
-    return res.status(200).json(
-        new ApiResponse(200, "Logout successful")
+    await LogoutService(
+        refreshToken,
+        req.language
     );
 
 
+    // Clear cookies
+    res.clearCookie(
+        "accessToken",
+        accessTokenOptions
+    );
+
+    res.clearCookie(
+        "refreshToken",
+        refreshTokenOptions
+    );
+
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            translate(
+                "AUTH.LOGOUT_SUCCESS",
+                req.language
+            )
+        )
+    );
 });
 
 
@@ -115,33 +179,53 @@ export const UpdateProfile = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
 
-    const user = await UpdateProfileService(userId, req.body)
+
+    const user =
+        await UpdateProfileService(
+            userId,
+            req.body,
+            req.language
+        );
+
 
     return res.status(200).json(
-        new ApiResponse(200, "Profile updated successfully", user)
+        new ApiResponse(
+            200,
+            translate(
+                "PROFILE.PROFILE_UPDATED",
+                req.language
+            ),
+            user
+        )
     );
-
-
 });
+
 
 
 export const UpdatePassword = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
 
-    const result = await updatePasswordService(userId, req.body);
+
+    const result =
+        await updatePasswordService(
+            userId,
+            req.body,
+            req.language
+        );
 
 
     return res.status(200).json(
-        200,
-        "password changed successfully",
-        result
-    )
-
-
-
+        new ApiResponse(
+            200,
+            translate(
+                "AUTH.PASSWORD_UPDATED",
+                req.language
+            ),
+            result
+        )
+    );
 });
-
 
 
 
@@ -150,20 +234,34 @@ export const DeactivateAccount = TryCatch(async (req, res) => {
     const userId = req.user._id;
 
 
-    await DeactivateAccountService(userId);
+    await DeactivateAccountService(
+        userId,
+        req.language
+    );
+
 
     // Logout user
-    res.clearCookie("accessToken", accessTokenOptions);
-    res.clearCookie("refreshToken", refreshTokenOptions);
+    res.clearCookie(
+        "accessToken",
+        accessTokenOptions
+    );
+
+    res.clearCookie(
+        "refreshToken",
+        refreshTokenOptions
+    );
+
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            "Account deactivated successfully",
+            translate(
+                "AUTH.ACCOUNT_DEACTIVATED",
+                req.language
+            ),
             null
         )
     );
-
 });
 
 
@@ -171,49 +269,95 @@ export const DeactivateAccount = TryCatch(async (req, res) => {
 export const DeleteAccount = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
+
     const { password } = req.body;
 
-    await DeleteAccountService(userId, password);
+
+    await DeleteAccountService(
+        userId,
+        password,
+        req.language
+    );
+
 
     // Logout user
-    res.clearCookie("accessToken", accessTokenOptions);
-    res.clearCookie("refreshToken", refreshTokenOptions);
+    res.clearCookie(
+        "accessToken",
+        accessTokenOptions
+    );
+
+    res.clearCookie(
+        "refreshToken",
+        refreshTokenOptions
+    );
+
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            "Account deleted successfully",
+            translate(
+                "AUTH.ACCOUNT_DELETED",
+                req.language
+            ),
             null
         )
     );
-
-
 });
+
 
 
 export const ForgotPassword = TryCatch(async (req, res) => {
 
     const { email } = req.body;
 
-    await ForgotPasswordService(email);
 
-    return res.status(200).json(
-        new ApiResponse(200, "Password reset OTP sent successfully", null)
+    await ForgotPasswordService(
+        email,
+        req.language
     );
 
 
-
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            translate(
+                "AUTH.FORGOT_PASSWORD_SUCCESS",
+                req.language
+            ),
+            null
+        )
+    );
 });
+
 
 
 export const ResetPassword = TryCatch(async (req, res) => {
 
-    const { email, otp, newPassword } = req.body;
+    const {
+        email,
+        otp,
+        newPassword
+    } = req.body;
 
-    await ResetPasswordService({ email, otp, newPassword })
+
+    await ResetPasswordService(
+        {
+            email,
+            otp,
+            newPassword
+        },
+        req.language
+    );
+
 
     return res.status(200).json(
-        new ApiResponse(200, "Password reset successfully", null)
-    )
-
+        new ApiResponse(
+            200,
+            translate(
+                "AUTH.PASSWORD_RESET_SUCCESS",
+                req.language
+            ),
+            null
+        )
+    );
 });

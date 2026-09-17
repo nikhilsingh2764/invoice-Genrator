@@ -1,13 +1,27 @@
-const errorMiddleware = (err,req,res,next) => {
+import logger from "../utils/logger.js";
+import * as Sentry from "@sentry/node";
 
-const statusCode = err.statusCode || 500;
 
-return res.status(statusCode).json({
-    success: false,
-    statusCode,
-    message: err.message || "Something went wrong",
-    errors: err.errors || [],
-});
+const errorMiddleware = (err, req, res, next) => {
+
+   // Send error to Sentry
+    Sentry.captureException(err);
+
+   logger.error({
+      message: err.message,
+      method: req.method,
+      url: req.originalUrl,
+      statusCode: err.statusCode || 500,
+      stack: err.stack
+   });
+
+   const statusCode = err.statusCode || 500;
+
+
+   return res.status(statusCode).json({
+      success: false,
+      message: err.message || "Something went wrong",
+  });
 
 
 };

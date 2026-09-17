@@ -1,30 +1,32 @@
-import ApiError from '../../utils/ApiError.js';
+import ApiError from "../../utils/ApiError.js";
 
 import invoiceRepository from "../../repository/invoice/invoice.repository.js";
 import businessRepository from "../../repository/invoice/business.repository.js";
 import customerRepository from "../../repository/invoice/customer.repository.js";
 
-import generateInvoicePDF from '../../utils/generateInvoicePDF.js';
-
-import { buildInvoiceItems } from '../../helper/invoice.helper.js';
-
-import generateInvoiceEmailContent from "../../utils/generateInvoiceEmailContent.js"
+import { buildInvoiceItems } from "../../helper/invoice.helper.js";
 
 import mongoose from "mongoose";
 import redis from "../../config/redis.js";
 
+import { invoicePDFQueue } from "../../queues/invoicePDF.queue.js";
+import { invoiceEmailQueue } from "../../queues/invoiceEmail.queue.js";
 
-import sendEmail from "../auth/email.service.js";
+import logger from "../../utils/logger.js";
+import translate from "../../utils/translate.js";
 
 
 
-export const createInvoiceService = async (userData) => {
+// Create Invoice
+export const createInvoiceService = async (
+    userData,
+    language = "en"
+) => {
 
     const session = await mongoose.startSession();
 
     try {
 
-        // Start transaction
         session.startTransaction();
 
         const {
@@ -37,22 +39,52 @@ export const createInvoiceService = async (userData) => {
             status
         } = userData;
 
+
         // Increment invoice number
-        const business = await businessRepository.incrementInvoiceNumber(
-            userId,
-            session
-        );
+        const business =
+            await businessRepository.incrementInvoiceNumber(
+                userId,
+                session
+            );
 
         if (!business) {
-            throw new ApiError(404, "Business profile not found");
+
+            logger.warn(
+                `Invoice creation failed - business profile not found: ${userId}`
+            );
+
+            throw new ApiError(
+                404,
+                translate(
+                    "BUSINESS.BUSINESS_NOT_FOUND",
+                    language
+                )
+            );
         }
 
-        // Find customer
-        const customer = await customerRepository.findById(customerId);
+
+        // Find customer belonging to user
+        const customer =
+            await customerRepository.findByIdAndUserId(
+                customerId,
+                userId
+            );
 
         if (!customer) {
-            throw new ApiError(404, "Customer profile not found");
+
+            logger.warn(
+                `Invoice creation failed - customer not found: ${customerId}`
+            );
+
+            throw new ApiError(
+                404,
+                translate(
+                    "CUSTOMER.CUSTOMER_NOT_FOUND",
+                    language
+                )
+            );
         }
+
 
         // Build invoice items
         const {
@@ -63,66 +95,69 @@ export const createInvoiceService = async (userData) => {
             grandTotal
         } = await buildInvoiceItems(items);
 
+
         const invoiceNumber =
             `${business.invoicePrefix}-${business.invoiceStartNumber}`;
 
+
         // Create invoice
-        const invoice = await invoiceRepository.create(
-            {
-                userId,
+        const invoice =
+            await invoiceRepository.create(
+                {
+                    userId,
 
-                business: {
-                    businessName: business.businessName,
-                    ownerName: business.ownerName,
-                    email: business.email,
-                    phone: business.phone,
-                    gstNumber: business.gstNumber,
-                    logo: business.logo,
-                    signature: business.signature,
-                    currency: business.currency,
-                    address: business.address
+                    business: {
+                        businessName: business.businessName,
+                        ownerName: business.ownerName,
+                        email: business.email,
+                        phone: business.phone,
+                        gstNumber: business.gstNumber,
+                        logo: business.logo,
+                        signature: business.signature,
+                        currency: business.currency,
+                        address: business.address
+                    },
+
+                    customer: {
+                        customerName: customer.customerName,
+                        email: customer.email,
+                        phone: customer.phone,
+                        companyName: customer.companyName,
+                        gstNumber: customer.gstNumber,
+                        customerType: customer.customerType,
+                        notes: customer.notes,
+                        billingAddress: customer.billingAddress,
+                        shippingAddress: customer.shippingAddress
+                    },
+
+                    items: invoiceItems,
+
+                    invoiceNumber,
+
+                    subTotal,
+                    totalTax,
+                    totalDiscount,
+                    grandTotal,
+
+                    dueDate,
+                    paymentMethod,
+                    notes,
+
+                    termsAndConditions:
+                        business.termsAndConditions,
+
+                    status
                 },
+                session
+            );
 
-                customer: {
-                    customerName: customer.customerName,
-                    email: customer.email,
-                    phone: customer.phone,
-                    companyName: customer.companyName,
-                    gstNumber: customer.gstNumber,
-                    customerType: customer.customerType,
-                    notes: customer.notes,
-                    billingAddress: customer.billingAddress,
-                    shippingAddress: customer.shippingAddress
-                },
-
-                items: invoiceItems,
-
-                invoiceNumber,
-
-                subTotal,
-                totalTax,
-                totalDiscount,
-                grandTotal,
-
-                dueDate,
-                paymentMethod,
-                notes,
-
-                termsAndConditions: business.termsAndConditions,
-
-                status
-            },
-            session
-        );
 
         await session.commitTransaction();
 
-        //remove invoice list cache
-        await redis.del(`invoices:${userId}:*`)
 
-        //* is only used when deleting multiple keys
-        //storing multipe keys no need of any special character 
-        // only define key is single or multiple like invoice: || invoices:
+        logger.info(
+            `Invoice created successfully: ${invoice._id}`
+        );
 
 
         return invoice;
@@ -130,6 +165,11 @@ export const createInvoiceService = async (userData) => {
     } catch (error) {
 
         await session.abortTransaction();
+
+        logger.error(
+            `Invoice creation failed: ${error.message}`
+        );
+
         throw error;
 
     } finally {
@@ -141,47 +181,110 @@ export const createInvoiceService = async (userData) => {
 
 
 
-export const getInvoiceByIdService = async (userId, invoiceId) => {
+// Get Invoice By ID
+export const getInvoiceByIdService = async (
+    userId,
+    invoiceId,
+    language = "en"
+) => {
 
-    const cacheKey = `invoice:${invoiceId}:${userId}`;
+    const cacheKey =
+        `invoice:${invoiceId}:${userId}`;
 
-    //get redis
-    const cacheInvoice = await redis.get(cacheKey);
 
-    if (cacheInvoice) {
-        return JSON.parse(cacheInvoice);
+    // Check Redis
+    const cachedInvoice =
+        await redis.get(cacheKey);
+
+    if (cachedInvoice) {
+
+        logger.info(
+            `Invoice cache hit: ${invoiceId}`
+        );
+
+        return JSON.parse(cachedInvoice);
     }
 
 
-    const invoice = await invoiceRepository.findById(userId, invoiceId)
+    logger.info(
+        `Invoice cache miss: ${invoiceId}`
+    );
+
+
+    // Get from MongoDB
+    const invoice =
+        await invoiceRepository.findById(
+            userId,
+            invoiceId
+        );
 
     if (!invoice) {
-        throw new ApiError(404, "Invoice not found");
+
+        logger.warn(
+            `Invoice not found: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "INVOICE.INVOICE_NOT_FOUND",
+                language
+            )
+        );
     }
 
 
-    //set redis
-
+    // Store in Redis
     await redis.set(
         cacheKey,
         JSON.stringify(invoice),
-        'EX',
+        "EX",
         600
     );
-    return invoice;
 
+
+    logger.info(
+        `Invoice fetched from DB and cached: ${invoiceId}`
+    );
+
+
+    return invoice;
 };
 
 
-export const updateInvoiceService = async (userId, invoiceId, updatedData) => {
 
-    const invoice = await invoiceRepository.findById(userId, invoiceId);
+// Update Invoice
+export const updateInvoiceService = async (
+    userId,
+    invoiceId,
+    updatedData,
+    language = "en"
+) => {
+
+    // Check invoice ownership
+    const invoice =
+        await invoiceRepository.findById(
+            userId,
+            invoiceId
+        );
 
     if (!invoice) {
-        throw new ApiError(404, "Invoice not found");
+
+        logger.warn(
+            `Invoice update attempted for non-existing invoice: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "INVOICE.INVOICE_NOT_FOUND",
+                language
+            )
+        );
     }
 
-    // Rebuild invoice items and totals if items are updated
+
+    // Rebuild invoice items and totals
     if (updatedData.items) {
 
         const {
@@ -190,7 +293,9 @@ export const updateInvoiceService = async (userId, invoiceId, updatedData) => {
             totalTax,
             totalDiscount,
             grandTotal
-        } = await buildInvoiceItems(updatedData.items);
+        } = await buildInvoiceItems(
+            updatedData.items
+        );
 
         updatedData.items = invoiceItems;
         updatedData.subTotal = subTotal;
@@ -199,14 +304,31 @@ export const updateInvoiceService = async (userId, invoiceId, updatedData) => {
         updatedData.grandTotal = grandTotal;
     }
 
-    // Update embedded customer snapshot if customer changes
+
+    // Update customer snapshot
     if (updatedData.customerId) {
 
-        const customer = await customerRepository.findById(updatedData.customerId);
+        const customer =
+            await customerRepository.findByIdAndUserId(
+                updatedData.customerId,
+                userId
+            );
 
         if (!customer) {
-            throw new ApiError(404, "Customer profile not found");
+
+            logger.warn(
+                `Invoice update failed - customer not found: ${updatedData.customerId}`
+            );
+
+            throw new ApiError(
+                404,
+                translate(
+                    "CUSTOMER.CUSTOMER_NOT_FOUND",
+                    language
+                )
+            );
         }
+
 
         updatedData.customer = {
             customerName: customer.customerName,
@@ -219,56 +341,134 @@ export const updateInvoiceService = async (userId, invoiceId, updatedData) => {
             billingAddress: customer.billingAddress,
             shippingAddress: customer.shippingAddress
         };
+
+        delete updatedData.customerId;
     }
 
-    const updatedInvoice = await invoiceRepository.updateById(
-        userId,
-        invoiceId,
-        updatedData
+
+    // Update MongoDB
+    const updatedInvoice =
+        await invoiceRepository.updateById(
+            userId,
+            invoiceId,
+            updatedData
+        );
+
+    if (!updatedInvoice) {
+
+        logger.error(
+            `Invoice update failed: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            500,
+            translate(
+                "INVOICE.INVOICE_UPDATE_FAILED",
+                language
+            )
+        );
+    }
+
+
+    // Invalidate invoice cache
+    await redis.del(
+        `invoice:${invoiceId}:${userId}`
     );
 
-    //remove invoice single cache
-    await redis.del(`invoice:${userId}`)
+
+    // Invalidate PDF cache
+    await redis.del(
+        `invoice:pdf:${userId}:${invoiceId}`
+    );
 
 
-    //remove invoice list cache
-    await redis.del(`invoices:${userId}:*`)
+    logger.info(
+        `Invoice updated successfully: ${invoiceId}`
+    );
 
 
     return updatedInvoice;
 };
 
 
-export const deleteInvoiceService = async (userId, invoiceId) => {
 
-    const invoiceExist = await invoiceRepository.existsById(userId, invoiceId);
+// Delete Invoice
+export const deleteInvoiceService = async (
+    userId,
+    invoiceId,
+    language = "en"
+) => {
+
+    const invoiceExist =
+        await invoiceRepository.existsById(
+            userId,
+            invoiceId
+        );
 
     if (!invoiceExist) {
-        throw new ApiError(404, "Invoice not found");
 
+        logger.warn(
+            `Invoice deletion attempted for non-existing invoice: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "INVOICE.INVOICE_NOT_FOUND",
+                language
+            )
+        );
     }
-    await invoiceRepository.deleteById(userId, invoiceId)
-
-    //remove invoice single cache
-    await redis.del(`invoice:${userId}`)
 
 
-    //remove invoice list cache
-    await redis.del(`invoices:${userId}:*`)
+    await invoiceRepository.deleteById(
+        userId,
+        invoiceId
+    );
+
+
+    // Invalidate invoice cache
+    await redis.del(
+        `invoice:${invoiceId}:${userId}`
+    );
+
+
+    // Invalidate PDF cache
+    await redis.del(
+        `invoice:pdf:${userId}:${invoiceId}`
+    );
+
+
+    logger.info(
+        `Invoice deleted successfully: ${invoiceId}`
+    );
+
 
     return null;
 };
 
 
-export const downloadInvoicePDFService = async (userId, invoiceId) => {
 
-    const cacheKey = `invoice:pdf:${userId}:${invoiceId}`
+// Download Invoice PDF
+export const downloadInvoicePDFService = async (
+    userId,
+    invoiceId,
+    language = "en"
+) => {
 
-    //check pdf cache
-    const cachedPDF = await redis.getBuffer(cacheKey);
+    const cacheKey =
+        `invoice:pdf:${userId}:${invoiceId}`;
+
+
+    // Check PDF cache
+    const cachedPDF =
+        await redis.getBuffer(cacheKey);
 
     if (cachedPDF) {
-        console.log("PDF from Redis");
+
+        logger.info(
+            `Invoice PDF cache hit: ${invoiceId}`
+        );
 
         return {
             pdfBuffer: cachedPDF,
@@ -276,113 +476,234 @@ export const downloadInvoicePDFService = async (userId, invoiceId) => {
         };
     }
 
-    const invoice = await invoiceRepository.findById(userId, invoiceId);
+
+    logger.info(
+        `Invoice PDF cache miss: ${invoiceId}`
+    );
+
+
+    // Check invoice exists
+    const invoice =
+        await invoiceRepository.findById(
+            userId,
+            invoiceId
+        );
 
     if (!invoice) {
-        throw new ApiError(404, "Invoice not found");
+
+        logger.warn(
+            `PDF generation requested for non-existing invoice: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "INVOICE.INVOICE_NOT_FOUND",
+                language
+            )
+        );
     }
 
-    // Generate PDF
-    const pdfBuffer = await generateInvoicePDF(invoice)
 
-    // Store PDF temporarily
-    await redis.set(
-        cacheKey,
-        pdfBuffer,
-        "EX",
-        3600
+    // Add PDF generation job
+    const job =
+        await invoicePDFQueue.add(
+            "generate-invoice-pdf",
+            {
+                userId: userId.toString(),
+                invoiceId: invoiceId.toString(),
+                language
+            }
+        );
+
+
+    logger.info(
+        `Invoice PDF generation job queued: ${job.id}`
     );
 
 
     return {
-        pdfBuffer,
-        invoiceNumber: invoice.invoiceNumber
+        jobId: job.id,
+        message: translate(
+            "PDF.PDF_DOWNLOAD_STARTED",
+            language
+        )
     };
-
-
-
 };
 
 
-export const sendInvoiceEmailService = async (userId, invoiceId) => {
 
+// Send Invoice Email
+export const sendInvoiceEmailService = async (
+    userId,
+    invoiceId,
+    language = "en"
+) => {
 
-    const invoice = await invoiceRepository.findById(userId, invoiceId);
+    // Check invoice exists
+    const invoice =
+        await invoiceRepository.findById(
+            userId,
+            invoiceId
+        );
 
     if (!invoice) {
-        throw new ApiError(404, "Invoice not found");
+
+        logger.warn(
+            `Invoice email requested for non-existing invoice: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "INVOICE.INVOICE_NOT_FOUND",
+                language
+            )
+        );
     }
 
-    const pdfBuffer = await generateInvoicePDF(invoice);
 
-    const emailContent = generateInvoiceEmailContent(invoice);
-
-
-    await sendEmail({
-        to: invoice.customer.email,
-        subject: emailContent.subject,
-        html: emailContent.body,
-        attachments: [
+    // Add invoice email job
+    const job =
+        await invoiceEmailQueue.add(
+            "send-invoice-email",
             {
-                filename: `invoice-${invoice.invoiceNumber}.pdf`,
-                content: pdfBuffer,
-                contentType: "application/pdf"
+                userId: userId.toString(),
+                invoiceId: invoiceId.toString(),
+                language
             }
-        ]
-    });
-
-    return true;
+        );
 
 
+    logger.info(
+        `Invoice email job queued: ${job.id}`
+    );
 
+
+    return {
+        jobId: job.id,
+        message: translate(
+            "EMAIL.INVOICE_EMAIL_QUEUED",
+            language
+        )
+    };
 };
 
 
 
-export const duplicateInvoiceService = async (userId, invoiceId) => {
+// Duplicate Invoice
+export const duplicateInvoiceService = async (
+    userId,
+    invoiceId,
+    language = "en"
+) => {
 
-    // Find invoice
-    const invoice = await invoiceRepository.findById(userId, invoiceId);
+    // Find original invoice
+    const invoice =
+        await invoiceRepository.findById(
+            userId,
+            invoiceId
+        );
 
     if (!invoice) {
-        throw new ApiError(404, "Invoice not found");
+
+        logger.warn(
+            `Invoice duplication attempted for non-existing invoice: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "INVOICE.INVOICE_NOT_FOUND",
+                language
+            )
+        );
     }
+
 
     // Generate next invoice number
-    const updatedBusiness = await businessRepository.incrementInvoiceNumber(userId);
+    const updatedBusiness =
+        await businessRepository.incrementInvoiceNumber(
+            userId
+        );
 
     if (!updatedBusiness) {
-        throw new ApiError(404, "Business profile not found");
+
+        logger.warn(
+            `Invoice duplication failed - business profile not found: ${userId}`
+        );
+
+        throw new ApiError(
+            404,
+            translate(
+                "BUSINESS.BUSINESS_NOT_FOUND",
+                language
+            )
+        );
     }
+
 
     const invoiceNumber =
         `${updatedBusiness.invoicePrefix}-${updatedBusiness.invoiceStartNumber}`;
 
-    // Convert Mongoose document to plain object
-    const duplicateInvoice = invoice.toObject();
 
-    // Remove MongoDB generated fields
+    const duplicateInvoice =
+        invoice.toObject();
+
+
     delete duplicateInvoice._id;
     delete duplicateInvoice.__v;
     delete duplicateInvoice.createdAt;
     delete duplicateInvoice.updatedAt;
 
-    // Calculate original payment period
-    const paymentDuration =
-        new Date(invoice.dueDate) - new Date(invoice.invoiceDate);
 
-    // Update invoice fields
-    duplicateInvoice.invoiceNumber = invoiceNumber;
-    duplicateInvoice.status = "Draft";
-    duplicateInvoice.invoiceDate = new Date();
-    duplicateInvoice.dueDate = new Date(
-        duplicateInvoice.invoiceDate.getTime() + paymentDuration
+    const paymentDuration =
+        new Date(invoice.dueDate) -
+        new Date(invoice.invoiceDate);
+
+
+    duplicateInvoice.invoiceNumber =
+        invoiceNumber;
+
+    duplicateInvoice.status =
+        "Draft";
+
+    duplicateInvoice.invoiceDate =
+        new Date();
+
+    duplicateInvoice.dueDate =
+        new Date(
+            duplicateInvoice.invoiceDate.getTime() +
+            paymentDuration
+        );
+
+
+    const newInvoice =
+        await invoiceRepository.create(
+            duplicateInvoice
+        );
+
+
+    if (!newInvoice) {
+
+        logger.error(
+            `Invoice duplication failed: ${invoiceId}`
+        );
+
+        throw new ApiError(
+            500,
+            translate(
+                "INVOICE.INVOICE_CREATE_FAILED",
+                language
+            )
+        );
+    }
+
+
+    logger.info(
+        `Invoice duplicated successfully: ${newInvoice._id}`
     );
 
-    // Create duplicated invoice
-    const newInvoice = await invoiceRepository.create(duplicateInvoice);
 
     return newInvoice;
 };
-
-

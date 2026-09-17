@@ -10,174 +10,101 @@ import { PAYMENT_STATUS } from "../../utils/invoice.constant.js";
 class DashboardRepository {
 
 
+    // Dashboard Statistics
     async getDashboardStats(userId) {
-
 
         const objectUserId = new mongoose.Types.ObjectId(userId);
 
-
+        const now = new Date();
 
         const [
-
             totalCustomers,
-
             totalProducts,
-
             totalInvoices,
-
             paidInvoices,
-
             pendingInvoices,
-
             overdueInvoices,
-
             amount
-
-
         ] = await Promise.all([
-
-
 
             Customer.countDocuments({
                 userId
             }),
 
-
-
             Product.countDocuments({
                 userId
             }),
 
-
-
             Invoice.countDocuments({
                 userId
             }),
 
-
-
             Invoice.countDocuments({
                 userId,
-                paymentStatus: PAYMENT_STATUS.PAID
+                status: PAYMENT_STATUS.PAID
             }),
 
-
-
             Invoice.countDocuments({
                 userId,
-                paymentStatus: PAYMENT_STATUS.PENDING
+                status: PAYMENT_STATUS.PENDING
             }),
 
-
-
             Invoice.countDocuments({
-
                 userId,
-
-                paymentStatus: PAYMENT_STATUS.PENDING,
-
-                dueDate:{
-                    $lt:new Date()
+                status: PAYMENT_STATUS.PENDING,
+                dueDate: {
+                    $lt: now
                 }
-
             }),
-
-
 
             Invoice.aggregate([
-
-
                 {
-                    $match:{
-                        userId:objectUserId
+                    $match: {
+                        userId: objectUserId
                     }
                 },
 
-
                 {
-                    $group:{
+                    $group: {
+                        _id: null,
 
-
-                        _id:null,
-
-
-                        totalRevenue:{
-
-
-                            $sum:{
-
-
-                                $cond:[
-
-
+                        totalRevenue: {
+                            $sum: {
+                                $cond: [
                                     {
-                                        $eq:[
-                                            "$paymentStatus",
+                                        $eq: [
+                                            "$status",
                                             PAYMENT_STATUS.PAID
                                         ]
                                     },
-
-
                                     "$grandTotal",
-
-
                                     0
-
-
                                 ]
-
                             }
-
-
                         },
 
-
-
-                        totalDueAmount:{
-
-
-                            $sum:{
-
-
-                                $cond:[
-
-
+                        totalDueAmount: {
+                            $sum: {
+                                $cond: [
                                     {
-                                        $eq:[
-                                            "$paymentStatus",
+                                        $eq: [
+                                            "$status",
                                             PAYMENT_STATUS.PENDING
                                         ]
                                     },
-
-
                                     "$grandTotal",
-
-
                                     0
-
-
                                 ]
-
                             }
-
                         }
-
-
                     }
-
                 }
-
-
             ])
 
         ]);
 
 
-
-
-
         return {
-
 
             totalCustomers,
 
@@ -194,104 +121,90 @@ class DashboardRepository {
             totalRevenue:
                 amount[0]?.totalRevenue || 0,
 
-
             totalDueAmount:
                 amount[0]?.totalDueAmount || 0
 
-
         };
-
-
     }
 
 
-
-
-
-
-    async getInvoiceList(userId, options){
-
+    // Invoice List
+    async getInvoiceList(userId, options = {}) {
 
         const {
-
-            page=1,
-
-            limit=10,
-
-            search="",
-
+            page = 1,
+            limit = 10,
+            search = "",
             paymentStatus,
-
             customerId,
-
             startDate,
-
             endDate,
-
-            sortBy="createdAt",
-
-            sortOrder="desc"
-
-
-        }=options;
+            sortBy = "createdAt",
+            sortOrder = "desc"
+        } = options;
 
 
+        const safePage = Math.max(Number(page) || 1, 1);
 
-        const filter={
+        const safeLimit = Math.min(
+            Math.max(Number(limit) || 10, 1),
+            100
+        );
 
-            userId:new mongoose.Types.ObjectId(userId)
 
+        const allowedSortFields = [
+            "createdAt",
+            "invoiceDate",
+            "dueDate",
+            "grandTotal",
+            "invoiceNumber",
+            "status"
+        ];
+
+        const safeSortBy = allowedSortFields.includes(sortBy)
+            ? sortBy
+            : "createdAt";
+
+        const safeSortOrder =
+            sortOrder === "asc" ? 1 : -1;
+
+
+        const filter = {
+            userId: new mongoose.Types.ObjectId(userId)
         };
 
 
+        // Search
+        if (search.trim()) {
 
-
-        if(search){
-
-
-            filter.$or=[
-
+            filter.$or = [
 
                 {
-
-                    invoiceNumber:{
-                        $regex:search,
-                        $options:"i"
+                    invoiceNumber: {
+                        $regex: search.trim(),
+                        $options: "i"
                     }
-
                 },
 
-
                 {
-
-                    "customer.customerName":{
-                        $regex:search,
-                        $options:"i"
+                    "customer.customerName": {
+                        $regex: search.trim(),
+                        $options: "i"
                     }
-
                 }
 
-
             ];
-
-
         }
 
 
-
-
-
-        if(paymentStatus){
-
-            filter.paymentStatus=paymentStatus;
-
+        // Payment Status
+        if (paymentStatus) {
+            filter.status = paymentStatus;
         }
 
 
-
-
-
-        if(customerId){
+        // Customer Filter
+        if (customerId) {
 
             filter.customerId =
                 new mongoose.Types.ObjectId(customerId);
@@ -299,439 +212,325 @@ class DashboardRepository {
         }
 
 
+        // Date Filter
+        if (startDate || endDate) {
 
+            filter.createdAt = {};
 
+            if (startDate) {
 
-        if(startDate || endDate){
+                const start = new Date(startDate);
 
+                start.setHours(0, 0, 0, 0);
 
-            filter.createdAt={};
-
-
-
-            if(startDate){
-
-                filter.createdAt.$gte =
-                    new Date(startDate);
-
+                filter.createdAt.$gte = start;
             }
 
 
+            if (endDate) {
 
-            if(endDate){
+                const end = new Date(endDate);
 
-                filter.createdAt.$lte =
-                    new Date(endDate);
+                end.setHours(23, 59, 59, 999);
 
+                filter.createdAt.$lte = end;
             }
-
 
         }
 
 
-
-
-
+        // Fetch invoices
         const invoices = await Invoice
             .find(filter)
             .sort({
-
-                [sortBy]:
-                sortOrder==="asc"?1:-1
-
+                [safeSortBy]: safeSortOrder
             })
             .skip(
-                (Number(page)-1) *
-                Number(limit)
+                (safePage - 1) * safeLimit
             )
-            .limit(Number(limit))
+            .limit(safeLimit)
             .lean();
 
 
-
-
-
+        // Total count
         const totalInvoices =
             await Invoice.countDocuments(filter);
 
 
+        // Format invoices
+        const formattedInvoices = invoices.map(
+            invoice => ({
 
+                ...invoice,
+
+                totalAmount:
+                    invoice.grandTotal,
+
+                paymentStatus:
+                    invoice.status
+
+            })
+        );
 
 
         return {
 
+            invoices: formattedInvoices,
 
-            invoices,
-
-
-            pagination:{
-
+            pagination: {
 
                 totalInvoices,
 
-
-                currentPage:Number(page),
-
+                currentPage: safePage,
 
                 totalPages:
-                Math.ceil(
-                    totalInvoices /
-                    Number(limit)
-                ),
+                    Math.ceil(
+                        totalInvoices / safeLimit
+                    ),
 
-
-                limit:Number(limit)
-
+                limit: safeLimit
 
             }
-
 
         };
 
-
     }
 
 
+    // Revenue Chart
+    async getRevenueChart(userId) {
 
-
-
-
-
-    async getRevenueChart(userId){
-
-
-        return Invoice.aggregate([
-
+        return await Invoice.aggregate([
 
             {
-
-                $match:{
-
+                $match: {
                     userId:
-                    new mongoose.Types.ObjectId(userId),
+                        new mongoose.Types.ObjectId(userId),
 
-                    paymentStatus:
-                    PAYMENT_STATUS.PAID
-
+                    status:
+                        PAYMENT_STATUS.PAID
                 }
-
             },
 
-
             {
+                $group: {
 
-                $group:{
+                    _id: {
 
-
-                    _id:{
-
-
-                        year:{
-                            $year:"$createdAt"
+                        year: {
+                            $year: "$createdAt"
                         },
 
-
-                        month:{
-                            $month:"$createdAt"
+                        month: {
+                            $month: "$createdAt"
                         }
 
-
                     },
 
-
-                    totalRevenue:{
-                        $sum:"$grandTotal"
+                    totalRevenue: {
+                        $sum: "$grandTotal"
                     },
 
-
-                    totalInvoices:{
-                        $sum:1
+                    totalInvoices: {
+                        $sum: 1
                     }
 
-
                 }
-
-
             },
 
-
             {
+                $sort: {
 
-                $sort:{
+                    "_id.year": 1,
 
-                    "_id.year":1,
-
-                    "_id.month":1
+                    "_id.month": 1
 
                 }
-
             }
 
-
         ]);
-
 
     }
 
 
+    // Invoice Status Chart
+    async getInvoiceStatusChart(userId) {
 
-
-
-
-
-    async getInvoiceStatusChart(userId){
-
-
-        return Invoice.aggregate([
-
+        return await Invoice.aggregate([
 
             {
+                $match: {
+                    userId:
+                        new mongoose.Types.ObjectId(userId)
+                }
+            },
 
-                $match:{
+            {
+                $group: {
+
+                    _id: "$status",
+
+                    totalInvoices: {
+                        $sum: 1
+                    }
+
+                }
+            }
+
+        ]);
+
+    }
+
+
+    // Top Customers
+    async getTopCustomers(userId) {
+
+        return await Invoice.aggregate([
+
+            {
+                $match: {
 
                     userId:
-                    new mongoose.Types.ObjectId(userId)
+                        new mongoose.Types.ObjectId(userId),
+
+                    status:
+                        PAYMENT_STATUS.PAID
 
                 }
-
             },
 
-
             {
+                $group: {
 
-                $group:{
+                    _id: "$customerId",
 
+                    customerName: {
+                        $first:
+                            "$customer.customerName"
+                    },
 
-                    _id:"$paymentStatus",
+                    customerEmail: {
+                        $first:
+                            "$customer.email"
+                    },
 
+                    totalInvoices: {
+                        $sum: 1
+                    },
 
-                    totalInvoices:{
-                        $sum:1
+                    totalRevenue: {
+                        $sum: "$grandTotal"
                     }
 
-
                 }
+            },
 
+            {
+                $sort: {
+                    totalRevenue: -1
+                }
+            },
+
+            {
+                $limit: 5
             }
 
-
         ]);
-
 
     }
 
 
+    // Top Products
+    async getTopProducts(userId) {
 
-
-
-
-
-    async getTopCustomers(userId){
-
-
-        return Invoice.aggregate([
-
+        return await Invoice.aggregate([
 
             {
-
-                $match:{
-
+                $match: {
 
                     userId:
-                    new mongoose.Types.ObjectId(userId),
+                        new mongoose.Types.ObjectId(userId),
 
-
-                    paymentStatus:
-                    PAYMENT_STATUS.PAID
-
+                    status:
+                        PAYMENT_STATUS.PAID
 
                 }
-
             },
 
-
+            {
+                $unwind: "$items"
+            },
 
             {
+                $group: {
 
-                $group:{
+                    _id: "$items.productId",
 
-
-                    _id:"$customerId",
-
-
-                    customerName:{
-                        $first:"$customer.customerName"
+                    productName: {
+                        $first:
+                            "$items.productName"
                     },
 
-
-                    customerEmail:{
-                        $first:"$customer.email"
+                    totalQuantitySold: {
+                        $sum:
+                            "$items.quantity"
                     },
 
-
-                    totalInvoices:{
-                        $sum:1
-                    },
-
-
-                    totalRevenue:{
-                        $sum:"$grandTotal"
+                    totalRevenue: {
+                        $sum:
+                            "$items.total"
                     }
 
-
                 }
-
             },
 
-
-
             {
-
-                $sort:{
-
-                    totalRevenue:-1
-
+                $sort: {
+                    totalRevenue: -1
                 }
-
             },
 
-
             {
-
-                $limit:5
-
+                $limit: 5
             }
-
 
         ]);
 
-
     }
 
 
+    // Recent Invoices
+    async getRecentInvoices(userId) {
+
+        const invoices = await Invoice
+            .find({
+                userId
+            })
+            .sort({
+                createdAt: -1
+            })
+            .limit(5)
+            .select(
+                "invoiceNumber customer grandTotal status dueDate createdAt"
+            )
+            .lean();
 
 
+        return invoices.map(
+            invoice => ({
 
+                ...invoice,
 
+                totalAmount:
+                    invoice.grandTotal,
 
-    async getTopProducts(userId){
+                paymentStatus:
+                    invoice.status
 
-
-        return Invoice.aggregate([
-
-
-            {
-
-                $match:{
-
-
-                    userId:
-                    new mongoose.Types.ObjectId(userId),
-
-
-                    paymentStatus:
-                    PAYMENT_STATUS.PAID
-
-
-                }
-
-            },
-
-
-
-            {
-
-                $unwind:"$items"
-
-            },
-
-
-
-            {
-
-                $group:{
-
-
-                    _id:"$items.productId",
-
-
-                    productName:{
-                        $first:"$items.productName"
-                    },
-
-
-                    totalQuantitySold:{
-                        $sum:"$items.quantity"
-                    },
-
-
-                    totalRevenue:{
-                        $sum:"$items.total"
-                    }
-
-
-                }
-
-            },
-
-
-
-            {
-
-                $sort:{
-
-                    totalRevenue:-1
-
-                }
-
-            },
-
-
-
-            {
-
-                $limit:5
-
-            }
-
-
-        ]);
-
+            })
+        );
 
     }
-
-
-
-
-
-
-    async getRecentInvoices(userId){
-
-
-        return Invoice.find({
-
-            userId
-
-        })
-
-        .sort({
-
-            createdAt:-1
-
-        })
-
-        .limit(5)
-
-        .select(
-            "invoiceNumber customer grandTotal paymentStatus dueDate createdAt"
-        )
-
-        .lean();
-
-
-    }
-
-
 
 }
 

@@ -1,81 +1,94 @@
 import jwt from "jsonwebtoken";
+
 import ApiError from "../utils/ApiError.js";
 import userRepository from "../repository/auth/user.repository.js";
 import TryCatch from "./TryCatch.js";
-
-const authMiddleware = TryCatch(async (req, res, next) => {
-
-    //get token from cookies
-    const accessToken = req.cookies.accessToken;
+import translate from "../utils/translate.js";
 
 
-    //check token exists
+const authMiddleware = TryCatch(async (
+    req,
+    res,
+    next
+) => {
+
+    // Get token from cookies
+    const accessToken =
+        req.cookies.accessToken;
+
+
+    // Check token exists
     if (!accessToken) {
-        throw new ApiError(401, "Access token is missing");
+
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.TOKEN_REQUIRED",
+                req.language
+            )
+        );
     }
 
-    //verify JWT
-    const decoded = jwt.verify(
-        accessToken,
-        process.env.ACCESS_TOKEN_SECRET
-    )
-    console.log(decoded);
 
-    //find latest user in DB
-    const user = await userRepository.findById(decoded.id);
+    // Verify JWT
+    let decoded;
 
-    console.log(user);
+    try {
 
-    
+        decoded = jwt.verify(
+            accessToken,
+            process.env.ACCESS_TOKEN_SECRET
+        );
+
+    } catch (error) {
+
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.INVALID_TOKEN",
+                req.language
+            )
+        );
+    }
+
+
+    // Find latest user in DB
+    const user =
+        await userRepository.findById(
+            decoded.id
+        );
+
+
     if (!user) {
-        throw new ApiError(401, "user not found");
+
+        throw new ApiError(
+            401,
+            translate(
+                "AUTH.USER_NOT_FOUND",
+                req.language
+            )
+        );
     }
 
-    //check user is active
+
+    // Check user is active
     if (!user.isActive) {
-        throw new ApiError(403, "Account is deactivated");
+
+        throw new ApiError(
+            403,
+            translate(
+                "AUTH.ACCOUNT_INACTIVE",
+                req.language
+            )
+        );
     }
 
-    // Store authenticated user for next middleware/controller
-    req.user = user;
-    next();
 
+    // Store authenticated user
+    req.user = user;
+
+    next();
 });
 
+
 export default authMiddleware;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

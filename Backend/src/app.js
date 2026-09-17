@@ -1,10 +1,12 @@
+import "./config/sentry.js";
+
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 
-import userRoutes from "./route/auth/user.Router.js";
+import userRoutes from "./route/auth/user.routes.js";
 import tokenRoutes from "./route/auth/token.routes.js"
 import businessRoutes from "./route/invoice/business.routes.js"
 import productRoutes from "./route/invoice/product.routes.js"
@@ -12,8 +14,18 @@ import customerRoutes from "./route/invoice/customer.routes.js"
 import invoiceRoutes from "./route/invoice/invoice.routes.js"
 import dashboardRoutes from "./route/dashboard/dashboard.routes.js"
 
+import healthRouter from "./route/health/health.routes.js";
+import metricsRouter from "./route/metrics/metrics.routes.js";
+import metricsMiddleware from "./middleware/metrics.middleware.js";
 
-import errorHandler from "./middleware/error.middleware.js";
+
+import requestLogger from "./middleware/requestLogger.js";
+
+import errorMiddleware from "./middleware/error.middleware.js";
+
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
+
 
 
 const app = express();
@@ -48,9 +60,15 @@ app.use(express.urlencoded({ extended: true }));
 // parses cookies from the request and stored in req.cookies.
 app.use(cookieParser());
 
+app.use(requestLogger);
 
 // HTTP Request Logger that logs HTTP requests for debugging and monitoring.
 app.use(morgan("dev"));
+
+
+app.use(metricsMiddleware);
+
+
 
 //routes handle here
 
@@ -67,12 +85,22 @@ app.use('/api/v1', customerRoutes);
 
 app.use('/api/v1', invoiceRoutes);
 
-app.use('/api/v1', dashboardRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
+app.use("/api/v1", healthRouter);
+
+app.use("/api/v1", metricsRouter);
 
 
 // Global Error Handler (ALWAYS LAST)
-app.use(errorHandler);
+app.use(errorMiddleware);
+
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec)
+);
+
 
 
 export default app;

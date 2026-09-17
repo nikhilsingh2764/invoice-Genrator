@@ -1,13 +1,15 @@
 import TryCatch from "../../middleware/TryCatch.js";
 import ApiResponse from "../../utils/ApiResponse.js";
+import translate from "../../utils/translate.js";
 
-import { getDashboardService } from "../../service/dashboard/dashboard.service.js";
+import {
+    getDashboardService
+} from "../../service/dashboard/dashboard.service.js";
 
 export const getDashboard = TryCatch(async (req, res) => {
 
     const userId = req.user._id;
 
-    // Query parameters
     const options = {
 
         page: req.query.page,
@@ -30,24 +32,23 @@ export const getDashboard = TryCatch(async (req, res) => {
 
     };
 
-    // Get dashboard data
+
     const dashboard = await getDashboardService(
         userId,
-        options
+        options,
+        req.language
     );
 
+
     return res.status(200).json(
-
         new ApiResponse(
-
             200,
-
-            "Dashboard fetched successfully",
-
+            translate(
+                "COMMON.DASHBOARD_FETCHED",
+                req.language
+            ),
             dashboard
-
         )
-
     );
 
 });
