@@ -24,4 +24,6 @@ jobs:
           cache: npm
 
 
-          
+                - name: Deploy to Render
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
