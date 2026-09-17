@@ -50,4 +50,4 @@ jobs:
 
       - name: Health check
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: curl --fail https://invoice-backend-drqr.onrender.com/health
+        run: curl --fail https://invoice-backend-drqr.onrender.com/api/v1/health
