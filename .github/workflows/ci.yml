@@ -50,5 +50,4 @@ jobs:
 
       - name: Health check
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: curl --fail https://api.render.com/deploy/srv-d9mteqvqj5pc73dosqm0?key=YTKNlEJLK4o
-        
+        run: curl --fail https://invoice-backend-drqr.onrender.com/health
