@@ -37,6 +37,9 @@ jobs:
       - name: Check Docker image
         run: docker image inspect invoice-api
 
+      - name: Create CI environment file
+        run: touch .env
+
       - name: Check Docker Compose
         run: docker compose config
 
