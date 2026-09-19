@@ -1,1069 +1,410 @@
-# 🧾 InvoicePilot — Invoice Management System
+<div align="center">
 
-A full-stack invoice management application built with **Node.js, Express.js, MongoDB, React, and Redis**.
+# 🧾 Invoice Processing & Async Email Automation API
 
-InvoicePilot helps businesses manage their billing workflow from a centralized platform. Users can manage business profiles, customers, products, and invoices, automatically calculate invoice totals, generate PDF invoices, download them, and send invoices to customers through email.
+**A production-style REST API for invoicing, with background PDF generation and email delivery powered by BullMQ and Redis.**
 
-The backend follows a layered architecture with separate **routes, controllers, services, repositories, models, middleware, and utilities**, along with JWT authentication, refresh-token based sessions, HTTP-only cookies, request validation, Redis caching, rate limiting, PDF generation, and email delivery.
+<p>
+  <a href="https://github.com/nikhilsingh2764/invoice-processing-and-async-email-automation-api/actions/workflows/ci.yml"><img src="https://github.com/nikhilsingh2764/invoice-processing-and-async-email-automation-api/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
+  <img src="https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs&logoColor=white" alt="Node.js 20" />
+  <img src="https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white" alt="Express 5" />
+  <img src="https://img.shields.io/badge/MongoDB-Mongoose%209-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Redis-BullMQ-DC382D?logo=redis&logoColor=white" alt="Redis and BullMQ" />
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/OpenAPI-Swagger-85EA2D?logo=swagger&logoColor=black" alt="Swagger" />
+</p>
 
----
+<p>
+  <a href="https://invoice-backend-drqr.onrender.com/api/v1/health">Live API</a> ·
+  <a href="https://invoice-backend-drqr.onrender.com/api-docs">Swagger Docs</a> ·
+  <a href="https://invoicepilot-zeta.vercel.app">Frontend Demo</a> ·
+  <a href="https://www.postman.com/technical-physicist-35686083-s-team/workspace/invoice-generator-api/collection/39798617-83cff721-5ce7-4e00-ba58-0d49017d3f39?action=share&creator=39798617">Postman Collection</a>
+</p>
 
-## 🚀 Live Demo
+</div>
 
-| Resource                  | Link                                                                                                                                                                                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🌐 Frontend               | [InvoicePilot Frontend](https://invoicepilot-zeta.vercel.app?utm_source=chatgpt.com)                                                                                                                                                              |
-| ⚙️ Backend API            | [InvoicePilot Backend API](https://invoice-backend-drqr.onrender.com?utm_source=chatgpt.com)                                                                                                                                                      |
-| 🧪 Postman API Collection | [Invoice Generator Postman Collection](https://www.postman.com/technical-physicist-35686083-s-team/workspace/invoice-generator-api/collection/39798617-83cff721-5ce7-4e00-ba58-0d49017d3f39?action=share&creator=39798617&utm_source=chatgpt.com) |
-| 💻 GitHub Repository      | [InvoicePilot GitHub Repository](https://github.com/nikhilsingh2764/invoice-Genrator?utm_source=chatgpt.com)                                                                                                                                      |
-
-> **Note:** The backend is deployed on Render's free tier, so the first request after a period of inactivity may take a few seconds while the service starts.
-
----
-
-## 📋 Table of Contents
-
-* [Problem & Solution](#-problem--solution)
-* [Key Features](#-key-features)
-* [System Architecture](#-system-architecture)
-* [Application Flow](#-application-flow)
-* [Authentication Flow](#-authentication-flow)
-* [Tech Stack](#️-tech-stack)
-* [Project Structure](#-project-structure)
-* [Database Design](#️-database-design)
-* [API Reference](#-api-reference)
-* [Redis & Caching](#-redis--caching)
-* [Security](#-security)
-* [Error Handling](#-error-handling)
-* [Installation](#-installation)
-* [Environment Variables](#️-environment-variables)
-* [API Testing](#-api-testing)
-* [Deployment](#-deployment)
-* [Technical Design Decisions](#-technical-design-decisions)
-* [Future Improvements](#-future-improvements)
-* [License](#-license)
+> **Note:** The live API runs on Render's free tier, so the first request after a period of inactivity can take a few seconds while the service wakes up.
 
 ---
 
-# 📌 Problem & Solution
+## 📖 About
 
-## Problem
+This project is the backend of **InvoicePilot**, an invoice management platform. Businesses can manage their profile, customers and products, create multi-item invoices with automatic tax and discount calculation, download invoices as PDFs, and email them to customers.
 
-Managing invoices manually becomes difficult as the number of customers, products, and transactions increases.
+The main goal was to build it the way a real service is built, not as a simple CRUD demo:
 
-Businesses need to maintain customer information, product pricing, taxes, discounts, invoice records, payment status, and invoice documents while also being able to quickly send invoices to customers.
-
-Handling these tasks separately can result in repetitive work and make invoice tracking more difficult.
-
-## Solution
-
-InvoicePilot provides a centralized invoice management system for the complete billing workflow.
-
-Users can:
-
-* Manage their business profile
-* Manage customers
-* Manage products and services
-* Create invoices containing multiple products
-* Automatically calculate invoice totals
-* Track invoice payment status
-* Search, filter, sort, and paginate invoices
-* Duplicate existing invoices
-* Generate PDF invoices
-* Download invoice PDFs
-* Send invoices through email
-* View business and invoice information through the dashboard
+- **Slow work never blocks a request.** PDF generation and email delivery run in background workers (BullMQ on Redis) with automatic retries and exponential backoff, and the API answers immediately with `202 Accepted`.
+- **Security is layered.** OTP email verification, bcrypt password hashing, short-lived JWT access tokens with rotating refresh tokens in HTTP-only cookies, account lockout, and Redis-backed rate limiting on every sensitive endpoint.
+- **It is observable and deployable.** Health probes, Prometheus metrics with a Grafana dashboard, Sentry error tracking, structured JSON logs, a Docker image, and a CI/CD pipeline that deploys to Render and verifies the release.
 
 ---
 
-# ✨ Key Features
+## ✨ Features
 
-## 🔐 Authentication & Security
+**Invoicing**
+- Business profile with a custom invoice prefix and an auto-incrementing invoice number per business
+- Customer and product management with search, filtering, and pagination
+- Multi-item invoices with automatic per-line discount and tax calculation
+- Invoice statuses: `Draft`, `Pending`, `Paid`, `Partially Paid`, `Overdue`, `Cancelled`
+- Payment methods: Cash, UPI, Credit Card, Debit Card, Bank Transfer, Cheque
+- Invoice duplication that keeps the original payment terms
+- Invoices store a **snapshot** of the business and customer details, so old invoices never change when a profile is edited
 
-* User registration
-* Email OTP verification
-* Google OAuth authentication
-* JWT authentication
-* Access token + refresh token flow
-* HTTP-only cookies
-* Protected API routes
-* Secure logout
-* Password hashing with bcrypt
-* Forgot-password flow
-* Password reset using OTP
-* Failed login attempt tracking
-* Temporary account lock mechanism
-* Rate limiting for authentication and API endpoints
-* Request validation
-* Helmet security headers
-* CORS configuration
+**Async processing**
+- PDF invoices generated in the background with PDFKit and cached in Redis
+- Invoice emails (with the PDF attached) sent through the Brevo API from a worker
+- OTP, welcome, and password-reset emails sent through the same queue system
+- Three retry attempts with exponential backoff for every job
 
----
+**Authentication & accounts**
+- Email signup with 6-digit OTP verification
+- Google sign-in
+- Login, logout, profile update, change password, forgot and reset password (by OTP)
+- Deactivate and delete account
 
-## 👤 User & Business Management
+**Analytics dashboard**
+- One endpoint returns stats, revenue chart, invoice status chart, top customers, top products, and recent invoices
+- Server-side search, payment-status filter, date range, sorting, and pagination, built on MongoDB aggregation pipelines
 
-### User Management
-
-* User registration and verification
-* Login and logout
-* Profile management
-* Password change
-* Password reset
-* Account deactivation
-* Account deletion
-
-### Business Management
-
-Users can create and manage their business profile, including:
-
-* Business name
-* Owner information
-* Contact details
-* GST information
-* Business logo
-* Signature
-* Currency
-* Terms and conditions
-
-Frequently accessed profile/business information can be cached using Redis.
+**Operations**
+- Health, liveness and readiness endpoints that check MongoDB and Redis
+- Prometheus metrics endpoint plus a Grafana container
+- Sentry error tracking and Winston structured logging
+- Graceful shutdown of the HTTP server, workers, Redis and MongoDB
+- Interactive API docs with Swagger UI (OpenAPI 3.0)
 
 ---
 
-## 👥 Customer Management
+## 🏗️ Architecture
 
-Users can:
+```mermaid
+flowchart LR
+    Client["Client<br/>React app or Postman"] -->|HTTPS + cookies| API["Express 5 API"]
 
-* Create customers
-* View customers
-* View individual customer details
-* Update customer information
-* Delete customers
-* Store billing and shipping addresses
+    API --> MW["Middleware<br/>Helmet, CORS, rate limiting,<br/>JWT auth, validation"]
+    MW --> CTRL["Controllers"]
+    CTRL --> SVC["Services"]
+    SVC --> REPO["Repositories"]
+    REPO --> DB[("MongoDB")]
 
----
+    SVC <-->|cache, OTPs, rate limits| REDIS[("Redis")]
+    SVC -->|enqueue jobs| QUEUES["BullMQ queues"]
+    QUEUES --> REDIS
+    QUEUES --> WORKERS["Workers"]
+    WORKERS --> PDF["PDFKit"]
+    WORKERS --> BREVO["Brevo email API"]
 
-## 📦 Product Management
-
-Users can manage products or services with:
-
-* Product name
-* Description
-* Category
-* Unit
-* Price
-* Tax rate
-* Discount
-
-Supported operations:
-
-* Create product
-* Get products
-* Get individual product
-* Update product
-* Delete product
-
----
-
-## 🧾 Invoice Management
-
-InvoicePilot supports:
-
-* Invoice creation
-* Multiple products per invoice
-* Automatic subtotal calculation
-* Automatic tax calculation
-* Automatic discount calculation
-* Grand total calculation
-* Payment status tracking
-* Invoice history
-* Search
-* Filtering
-* Sorting
-* Pagination
-* Invoice duplication
-
-Supported invoice statuses include:
-
-* Draft
-* Pending
-* Paid
-* Partially Paid
-* Overdue
-* Cancelled
-
----
-
-## 📄 PDF Generation
-
-The backend generates dynamic invoice PDFs using **PDFKit**.
-
-Users can:
-
-* Generate invoice PDFs
-* Download invoice PDFs
-* Generate invoices using stored business/customer/product information
-
----
-
-## 📧 Email Delivery
-
-Invoices can be sent directly to customers through email.
-
-The email system integrates with **Brevo API** and supports PDF invoice attachments.
-
----
-
-# 🏗️ System Architecture
-
-```text
-                         Client
-                           │
-                           ▼
-                    React Frontend
-                           │
-                           ▼
-                       Axios API
-                           │
-                           ▼
-                  ┌─────────────────┐
-                  │  Express Server │
-                  └────────┬────────┘
-                           │
-                           ▼
-                    Middleware Layer
-             ┌─────────────┼─────────────┐
-             │             │             │
-        Authentication   Validation   Rate Limiting
-             │             │             │
-             └─────────────┼─────────────┘
-                           ▼
-                         Routes
-                           │
-                           ▼
-                      Controllers
-                           │
-                           ▼
-                        Services
-                           │
-                           ▼
-                      Repositories
-                           │
-                 ┌─────────┴─────────┐
-                 ▼                   ▼
-              MongoDB              Redis
-                                   │
-                    ┌──────────────┴──────────────┐
-                    │                             │
-                 Caching                    Rate Limiting
-
-                         External Services
-                                │
-                    ┌───────────┴───────────┐
-                    ▼                       ▼
-                 Brevo                    PDFKit
-                Email API              PDF Generation
+    API -.->|/metrics| PROM["Prometheus"] -.-> GRAF["Grafana"]
+    API -.->|errors| SENTRY["Sentry"]
 ```
 
----
+The code follows a strict layered structure: **routes → controllers → services → repositories → models**. Controllers handle HTTP only, services hold the business logic, and repositories are the only layer that talks to MongoDB.
 
-# 🔄 Application Flow
+### Example: emailing an invoice
 
-```text
-User
- │
- ▼
-Register / Login
- │
- ▼
-Email Verification / Google OAuth
- │
- ▼
-Authenticated Session
- │
- ▼
-Create Business Profile
- │
- ├──► Add Customers
- │
- └──► Add Products
-          │
-          ▼
-      Create Invoice
-          │
-          ▼
-   Automatic Calculations
-          │
-          ▼
-    Invoice Stored
-          │
-      ┌───┴────┐
-      ▼        ▼
-   PDF      Email
-      │        │
-      ▼        ▼
- Download   Customer
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as API
+    participant Q as BullMQ (Redis)
+    participant W as Invoice email worker
+    participant B as Brevo
+
+    C->>A: POST /api/v1/invoice/:id/email
+    A->>A: Check the invoice belongs to the user
+    A->>Q: Add job to invoice-email queue
+    A-->>C: 202 Accepted with jobId
+    Q->>W: Deliver job
+    W->>W: Load invoice and render PDF
+    W->>B: Send email with PDF attached
+    Note over W,Q: On failure the job is retried<br/>up to 3 times with exponential backoff
 ```
 
----
+### Background queues
 
-# 🔐 Authentication Flow
+| Queue | Purpose | Worker action |
+| --- | --- | --- |
+| `send-email` | OTP, welcome, and password-reset emails | Sends the email through Brevo |
+| `invoice-pdf` | On-demand invoice PDF generation | Builds the PDF and caches it in Redis for 1 hour |
+| `invoice-email` | Emailing an invoice to a customer | Builds the PDF and sends it as an attachment |
 
-InvoicePilot uses JWT-based authentication with separate access and refresh tokens.
+All queues use 3 attempts with exponential backoff (5 s base delay) and keep the last 100 completed and failed jobs. Each worker processes up to 5 jobs concurrently. Workers start together with the API process, and `npm run worker` runs the email worker on its own.
 
-```text
-                    Login
-                      │
-                      ▼
-              Validate Credentials
-                      │
-                      ▼
-            Generate Access Token
-                      +
-            Generate Refresh Token
-                      │
-                      ▼
-               HTTP-only Cookies
-                      │
-                      ▼
-              Protected API Request
-                      │
-                      ▼
-              Validate Access Token
-                      │
-                ┌─────┴─────┐
-                │           │
-              Valid       Expired
-                │           │
-                ▼           ▼
-             Request    Refresh Token
-             Allowed         │
-                            ▼
-                    Generate New Access
-                         Token
-```
-
-### Logout
-
-```text
-Logout Request
-      │
-      ▼
-Invalidate Refresh Token
-      │
-      ▼
-Session Can No Longer Be Refreshed
-```
+**PDF download flow:** `GET /invoice/:id/pdf` returns the file straight from Redis when it is cached. On a cache miss it queues a job and returns `202` with a `jobId`; once the worker finishes, the next request is served from cache.
 
 ---
 
-# 🛠️ Tech Stack
+## 🛠️ Tech Stack
 
-## Backend
-
-| Technology         | Purpose                    |
-| ------------------ | -------------------------- |
-| Node.js            | JavaScript runtime         |
-| Express.js         | REST API framework         |
-| MongoDB            | Database                   |
-| Mongoose           | MongoDB ODM                |
-| Redis              | Caching and rate limiting  |
-| ioredis            | Redis client               |
-| JWT                | Authentication             |
-| bcrypt             | Password hashing           |
-| Zod                | Request validation         |
-| express-validator  | Request validation         |
-| Helmet             | HTTP security headers      |
-| CORS               | Cross-origin configuration |
-| express-rate-limit | API rate limiting          |
-| PDFKit             | PDF invoice generation     |
-| Brevo API          | Email delivery             |
-| Nodemailer         | Email handling             |
-| dotenv             | Environment configuration  |
-| Morgan             | HTTP request logging       |
-| Nodemon            | Development server         |
-
-## Frontend
-
-| Technology      | Purpose             |
-| --------------- | ------------------- |
-| React           | UI                  |
-| Vite            | Frontend build tool |
-| Tailwind CSS    | Styling             |
-| Zustand         | State management    |
-| React Router    | Routing             |
-| Axios           | API communication   |
-| React Hook Form | Form management     |
-| Zod             | Form validation     |
-| Framer Motion   | Animations          |
-| React Hot Toast | Notifications       |
-| Lucide React    | Icons               |
-| React Icons     | Icons               |
-| ESLint          | Code quality        |
+| Category | Technologies |
+| --- | --- |
+| **Runtime & framework** | Node.js 20, Express 5 (ES modules) |
+| **Database** | MongoDB with Mongoose 9 (transactions, aggregation pipelines) |
+| **Cache & queues** | Redis (ioredis), BullMQ |
+| **Auth & security** | JWT, bcrypt, Helmet, CORS, express-rate-limit with rate-limit-redis, Google OAuth (google-auth-library) |
+| **Validation** | express-validator |
+| **Documents & email** | PDFKit, Brevo transactional email API |
+| **Observability** | Winston, Morgan, Sentry, Prometheus (prom-client), Grafana |
+| **API docs** | swagger-jsdoc, swagger-ui-express |
+| **i18n** | i18next with English and Hindi message catalogs |
+| **DevOps** | Docker, Docker Compose, GitHub Actions, Render |
+| **Tooling** | Git, Postman, Nodemon |
 
 ---
 
-# 📂 Project Structure
+## 📁 Project Structure
 
 ```text
-invoice-Genrator/
-│
+.
+├── .github/workflows/ci.yml        # CI/CD pipeline
 ├── Backend/
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── Database & Redis configuration
-│   │   │
-│   │   ├── controller/
-│   │   │   ├── auth/
-│   │   │   └── invoice/
-│   │   │
-│   │   ├── helper/
-│   │   │
-│   │   ├── middleware/
-│   │   │   └── Authentication & error handling
-│   │   │
-│   │   ├── model/
-│   │   │   ├── auth/
-│   │   │   └── invoice/
-│   │   │
-│   │   ├── repository/
-│   │   │   ├── auth/
-│   │   │   ├── dashboard/
-│   │   │   └── invoice/
-│   │   │
-│   │   ├── route/
-│   │   │   ├── auth/
-│   │   │   ├── dashboard/
-│   │   │   └── invoice/
-│   │   │
-│   │   ├── service/
-│   │   │   ├── auth/
-│   │   │   ├── dashboard/
-│   │   │   └── invoice/
-│   │   │
-│   │   ├── templates/
-│   │   │   └── Email & PDF templates
-│   │   │
-│   │   ├── utils/
-│   │   │   └── Reusable utilities
-│   │   │
-│   │   ├── app.js
-│   │   └── server.js
-│   │
-│   ├── package.json
-│   └── test.http
-│
-├── Frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── constants/
-│   │   ├── hooks/
-│   │   ├── layout/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── store/
-│   │   ├── styles/
-│   │   ├── utils/
-│   │   ├── validation/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   │
-│   ├── package.json
-│   ├── vite.config.js
-│   └── eslint.config.js
-│
-└── README.md
+│   ├── Dockerfile
+│   ├── docker-compose.yml          # API + Redis + MongoDB + Prometheus + Grafana
+│   ├── prometheus/prometheus.yml
+│   ├── .env.example
+│   └── src/
+│       ├── server.js               # Startup, workers, graceful shutdown
+│       ├── app.js                  # Middleware and route registration
+│       ├── config/                 # db, redis, sentry, swagger, metrics, i18n
+│       ├── route/                  # Routes with Swagger annotations
+│       ├── controller/             # HTTP layer
+│       ├── service/                # Business logic
+│       ├── repository/             # Database access
+│       ├── model/                  # Mongoose schemas
+│       ├── validators/             # express-validator rules
+│       ├── middleware/             # auth, rate limiters, errors, metrics, logging
+│       ├── queues/                 # BullMQ queue definitions
+│       ├── worker/                 # BullMQ workers
+│       ├── templates/              # HTML email and invoice templates
+│       ├── locales/                # en and hi translations
+│       └── utils/                  # logger, ApiError, PDF, token helpers
+└── Frontend/                       # React + Vite client
 ```
 
-## The repository structure is based on the generated documentation, including the controller/service/repository separation and frontend organization.
+---
 
-# 🗄️ Database Design
+## 🔌 API Reference
 
-The application uses MongoDB with Mongoose.
+Base path: `/api/v1`. Interactive documentation is available at `/api-docs`.
 
-### Main entities
+<details open>
+<summary><b>Authentication</b></summary>
 
-```text
-User
- │
- ├── Business
- │
- ├── Customers
- │
- ├── Products
- │
- └── Invoices
-        │
-        ├── Customer
-        │
-        └── Products
-```
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| POST | `/signup` | No | Start signup and send an OTP by email |
+| POST | `/verify-otp` | No | Verify the OTP and create the account |
+| POST | `/login` | No | Log in and set access and refresh cookies |
+| POST | `/google` | No | Sign in with a Google ID token |
+| POST | `/refresh-token` | Cookie | Rotate the refresh token and issue new tokens |
+| POST | `/forgot-password` | No | Send a password-reset OTP |
+| POST | `/reset-password` | No | Reset the password with the OTP |
+| GET | `/profile` | Yes | Get the current user |
+| POST | `/logout` | Yes | Log out and revoke the refresh token |
+| PATCH | `/update-profile` | Yes | Update profile details |
+| PATCH | `/change-password` | Yes | Change password |
+| PATCH | `/deactivate-account` | Yes | Deactivate the account |
+| DELETE | `/delete-account` | Yes | Delete the account |
 
-### Authentication Models
+</details>
 
-```text
-User
-OTP
-RefreshToken
-```
+<details>
+<summary><b>Business, customers and products</b></summary>
 
-### Invoice Models
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST · GET · PATCH · DELETE | `/business` | Manage the business profile |
+| POST · GET | `/customer` | Create a customer, list customers |
+| GET · PATCH · DELETE | `/customer/:id` | Read, update or delete a customer |
+| POST · GET | `/product` | Create a product, list products |
+| GET · PATCH · DELETE | `/product/:id` | Read, update or delete a product |
 
-```text
-Business
-Customer
-Product
-Invoice
-Address
-```
+</details>
 
-The repository separates authentication models from invoice/business models, as reflected in the project structure.
+<details>
+<summary><b>Invoices</b></summary>
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/invoice` | Create an invoice (runs in a MongoDB transaction) |
+| GET | `/invoice/:id` | Get an invoice (Redis-cached) |
+| PATCH | `/invoice/:id` | Update an invoice and recalculate totals |
+| DELETE | `/invoice/:id` | Delete an invoice |
+| GET | `/invoice/:id/pdf` | Download the PDF, or queue generation and get `202` |
+| POST | `/invoice/:id/email` | Queue an email with the PDF attached, returns `202` |
+| POST | `/invoice/:id/duplicate` | Duplicate an invoice as a new draft |
+
+</details>
+
+<details>
+<summary><b>Dashboard and operations</b></summary>
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/dashboard` | Stats, charts, and a filterable invoice list |
+| GET | `/health` | Full health check (API, MongoDB, Redis) |
+| GET | `/health/live` | Liveness probe |
+| GET | `/health/ready` | Readiness probe (returns `503` when a dependency is down) |
+| GET | `/metrics` | Prometheus metrics |
+
+Dashboard query parameters: `page`, `limit`, `search`, `paymentStatus`, `customerId`, `startDate`, `endDate`, `sortBy`, `sortOrder`.
+
+</details>
 
 ---
 
-# ⚡ Redis & Caching
+## 🔐 Security
 
-Redis is used for performance and API protection.
-
-## Redis Responsibilities
-
-### 1. Profile / Business Caching
-
-Frequently accessed user and business information can be cached to reduce repeated database queries.
-
-```text
-API Request
-    │
-    ▼
-Check Redis
-    │
- ┌──┴───┐
- │      │
-Hit    Miss
- │      │
- ▼      ▼
-Return  MongoDB
-Cache     │
-          ▼
-      Store in Redis
-          │
-          ▼
-       Response
-```
-
-### 2. Rate Limiting
-
-Redis is also used with the rate-limiting system to control repeated requests and protect authentication/API endpoints.
+| Area | Implementation |
+| --- | --- |
+| **Password storage** | bcrypt hashing with salt |
+| **Email verification** | 6-digit OTP stored in Redis with a 5-minute expiry; the account is created only after verification |
+| **Sessions** | 15-minute access token and 15-day refresh token, both in `HttpOnly`, `Secure` cookies |
+| **Refresh tokens** | Stored server-side and rotated on every use, so a used or revoked token stops working |
+| **Brute-force protection** | Account locks for 15 minutes after 5 failed logins, plus per-route rate limiting |
+| **Rate limiting** | Redis-backed limiters for login, signup, OTP, password reset, token refresh, and each business, customer, product and invoice action, so limits hold across multiple server instances |
+| **Data isolation** | Every repository query is scoped by the authenticated user's ID |
+| **HTTP hardening** | Helmet headers, CORS restricted to `CLIENT_URL` with credentials, `trust proxy` for deployment behind a load balancer |
+| **Input validation** | express-validator rules on every write endpoint |
+| **Errors** | One central error handler returns clean JSON to clients while stack traces go to logs and Sentry |
 
 ---
 
-# 🛡️ Security
+## ⚡ Caching Strategy
 
-The application implements multiple security layers:
-
-* JWT authentication
-* Access and refresh tokens
-* HTTP-only cookies
-* Password hashing with bcrypt
-* Email OTP verification
-* Google OAuth authentication
-* Protected routes
-* Rate limiting
-* Failed login attempt tracking
-* Temporary account locking
-* Request validation
-* Helmet security headers
-* CORS configuration
-* Environment variables for sensitive configuration
-* Refresh-token invalidation during logout
-
-The generated repository documentation specifically identifies these authentication and security mechanisms.
+| Data | Redis key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Business profile | `business:{userId}` | 10 min | Refreshed on update |
+| Invoice | `invoice:{invoiceId}:{userId}` | 10 min | Deleted on update or delete |
+| Invoice PDF | `invoice:pdf:{userId}:{invoiceId}` | 1 hour | Deleted on update or delete |
+| Dashboard | `dashboard:{userId}:{query}` | 10 min | Expires by TTL |
+| Signup and reset OTP | `otp:{type}:{email}` | 5 min | Deleted after verification |
 
 ---
 
-# 🚨 Error Handling
+## 📊 Observability
 
-The backend contains dedicated middleware and utility layers for handling API errors and responses.
-
-The architecture separates error-handling middleware from business logic so that controllers and services do not need to independently implement the entire error-handling flow.
-
-```text
-Request
-   │
-   ▼
-Route
-   │
-   ▼
-Controller
-   │
-   ▼
-Service
-   │
-   ├──── Success ────► Response
-   │
-   └──── Error ──────► Error Middleware
-                           │
-                           ▼
-                    Standard API Response
-```
-
-> Error responses should be handled through the application's centralized error-handling implementation rather than exposing internal server details.
+- **Health:** `/api/v1/health`, `/health/live` and `/health/ready` for Docker, Kubernetes, and uptime monitors
+- **Metrics:** `/api/v1/metrics` exposes default Node.js metrics, `http_requests_total`, and the `http_request_duration_seconds` histogram, labelled by method, route and status code
+- **Dashboards:** Prometheus and Grafana run alongside the API in Docker Compose
+- **Errors:** unhandled errors are captured in Sentry
+- **Logs:** Winston writes structured JSON to the console and to `logs/app.log` and `logs/error.log`
 
 ---
 
-# 📚 API Reference
+## 🚀 Getting Started
 
-All API endpoints are prefixed with:
+### Prerequisites
 
-```text
-/api/v1
-```
+- Node.js 20 or later
+- MongoDB (Atlas or a local **replica set**, see the note below)
+- Redis 7 or later
+- A [Brevo](https://www.brevo.com/) account and API key for email
+- A Google OAuth client ID if you want Google sign-in
 
-## Authentication
+> **MongoDB note:** invoice creation uses multi-document transactions to allocate invoice numbers safely. Transactions need a replica set, so use MongoDB Atlas or run a local single-node replica set. A plain standalone `mongod` will reject invoice creation.
 
-| Method | Endpoint              | Description                    |
-| ------ | --------------------- | ------------------------------ |
-| POST   | `/signup`             | Register a new user            |
-| POST   | `/verify-otp`         | Verify user email              |
-| POST   | `/login`              | Login                          |
-| POST   | `/google`             | Google OAuth login/signup      |
-| GET    | `/profile`            | Get authenticated user profile |
-| POST   | `/logout`             | Logout                         |
-| PATCH  | `/update-profile`     | Update profile                 |
-| PATCH  | `/change-password`    | Change password                |
-| PATCH  | `/deactivate-account` | Deactivate account             |
-| DELETE | `/delete-account`     | Delete account                 |
-| POST   | `/forgot-password`    | Request password reset OTP     |
-| POST   | `/reset-password`     | Reset password                 |
-| POST   | `/refresh-token`      | Generate a new access token    |
-
----
-
-## Business
-
-| Method | Endpoint    | Description             |
-| ------ | ----------- | ----------------------- |
-| POST   | `/business` | Create business profile |
-| GET    | `/business` | Get business profile    |
-| PATCH  | `/business` | Update business profile |
-| DELETE | `/business` | Delete business profile |
-
----
-
-## Customers
-
-| Method | Endpoint        | Description        |
-| ------ | --------------- | ------------------ |
-| POST   | `/customer`     | Create customer    |
-| GET    | `/customer`     | Get customers      |
-| GET    | `/customer/:id` | Get customer by ID |
-| PATCH  | `/customer/:id` | Update customer    |
-| DELETE | `/customer/:id` | Delete customer    |
-
----
-
-## Products
-
-| Method | Endpoint       | Description       |
-| ------ | -------------- | ----------------- |
-| POST   | `/product`     | Create product    |
-| GET    | `/product`     | Get products      |
-| GET    | `/product/:id` | Get product by ID |
-| PATCH  | `/product/:id` | Update product    |
-| DELETE | `/product/:id` | Delete product    |
-
----
-
-## Invoices
-
-| Method | Endpoint                 | Description          |
-| ------ | ------------------------ | -------------------- |
-| POST   | `/invoice`               | Create invoice       |
-| GET    | `/invoice/:id`           | Get invoice          |
-| PATCH  | `/invoice/:id`           | Update invoice       |
-| DELETE | `/invoice/:id`           | Delete invoice       |
-| GET    | `/invoice/:id/pdf`       | Download invoice PDF |
-| POST   | `/invoice/:id/email`     | Email invoice        |
-| POST   | `/invoice/:id/duplicate` | Duplicate invoice    |
-
----
-
-## Dashboard
-
-| Method | Endpoint | Description                               |
-| ------ | -------- | ----------------------------------------- |
-| GET    | `/`      | Dashboard summary and invoice information |
-
-The endpoint list above follows the generated repository documentation.
-
----
-
-# 🧪 API Testing
-
-The API can be tested using the public Postman collection.
-
-### Postman Collection
-
-[Open Invoice Generator API Collection in Postman](https://www.postman.com/technical-physicist-35686083-s-team/workspace/invoice-generator-api/collection/39798617-83cff721-5ce7-4e00-ba58-0d49017d3f39?action=share&creator=39798617&utm_source=chatgpt.com)
-
-The collection can be used to test:
-
-* Authentication
-* OTP verification
-* Token refresh
-* Protected routes
-* Business APIs
-* Customer APIs
-* Product APIs
-* Invoice APIs
-* PDF generation
-* Email delivery
-
----
-
-# ⚙️ Installation
-
-## Prerequisites
-
-Before running the project locally, install:
-
-* Node.js 18+
-* MongoDB or MongoDB Atlas
-* Redis or Redis Cloud
-* Git
-
-These prerequisites are also listed in the generated project documentation.
-
----
-
-## 1. Clone Repository
+### Run locally
 
 ```bash
-git clone https://github.com/nikhilsingh2764/invoice-Genrator.git
-cd invoice-Genrator
+git clone https://github.com/nikhilsingh2764/invoice-processing-and-async-email-automation-api.git
+cd invoice-processing-and-async-email-automation-api/Backend
+
+cp .env.example .env      # then fill in your values
+npm install
+npm run dev               # API and workers on http://localhost:8000
 ```
 
----
-
-## 2. Backend Setup
+### Run with Docker
 
 ```bash
 cd Backend
-npm install
+cp .env.example .env      # required, the compose file reads it
+docker compose up --build
 ```
 
-Create a `.env` file inside the `Backend` directory.
+| Service | URL |
+| --- | --- |
+| API | http://localhost:8000 |
+| Swagger docs | http://localhost:8000/api-docs |
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 |
+
+The compose file overrides `REDIS_URL` and `MONGODB_URI` to point at its own containers. On macOS or Windows, change the Prometheus target in `prometheus/prometheus.yml` from `172.17.0.1:8000` to `host.docker.internal:8000`.
+
+### Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the API and workers with Nodemon |
+| `npm start` | Start the API and workers (production) |
+| `npm run worker` | Run the email worker as a standalone process |
+
+### Environment variables
+
+| Variable | Description |
+| --- | --- |
+| `PORT` | Server port (default `8000` in Docker) |
+| `NODE_ENV` | `development` or `production` |
+| `MONGODB_URI` | MongoDB connection string |
+| `REDIS_URL` | Redis connection string |
+| `CLIENT_URL` | Frontend origin allowed by CORS |
+| `ACCESS_TOKEN_SECRET` | Secret for signing access tokens |
+| `ACCESS_TOKEN_EXPIRES_IN` | Access token lifetime, for example `15m` |
+| `REFRESH_TOKEN_SECRET` | Secret for signing refresh tokens |
+| `REFRESH_TOKEN_EXPIRES_IN` | Refresh token lifetime, for example `15d` |
+| `BREVO_API_KEY` | Brevo API key for sending email |
+| `EMAIL_USER` | Verified sender address in Brevo |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `SENTRY_DSN` | Sentry project DSN (optional) |
+
+Use long, random values for the token secrets and never commit your `.env` file.
 
 ---
 
-## 3. Start Backend
+## 🔄 CI/CD
 
-```bash
-npm run dev
-```
-
-The backend runs on the configured port.
-
----
-
-## 4. Frontend Setup
-
-Open another terminal:
-
-```bash
-cd Frontend
-npm install
-```
-
-Create the frontend environment file and configure the backend API URL.
-
----
-
-## 5. Start Frontend
-
-```bash
-npm run dev
-```
-
-The frontend will be available through the Vite development server.
-
----
-
-# ⚙️ Environment Variables
-
-## Backend
-
-Create:
+Every push and pull request to `main` runs the pipeline in [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 ```text
-Backend/.env
+Checkout → Set up Node 20 → npm ci → Build Docker image → Validate docker compose config
+                                                 │
+                                   (push to main only)
+                                                 ▼
+                       Trigger Render deploy hook → Wait → Health check on the live API
 ```
 
-Example:
-
-```env
-PORT=5000
-
-MONGODB_URI=your_mongodb_connection_string
-
-REDIS_URL=your_redis_connection_string
-
-ACCESS_TOKEN_SECRET=your_access_token_secret
-ACCESS_TOKEN_EXPIRES_IN=15m
-
-REFRESH_TOKEN_SECRET=your_refresh_token_secret
-REFRESH_TOKEN_EXPIRES_IN=15d
-
-BREVO_API_KEY=your_brevo_api_key
-
-EMAIL_USER=your_email
-
-CLIENT_URL=http://localhost:5173
-
-GOOGLE_CLIENT_ID=your_google_client_id
-```
-
-Never commit real secrets or API keys to GitHub.
-
-The generated documentation identifies these environment variables and their purposes.
+The pipeline fails if the image does not build or if the deployed API does not answer its health endpoint.
 
 ---
 
-## Frontend
+## 🧠 Design Decisions
 
-Create:
-
-```text
-Frontend/.env
-```
-
-Example:
-
-```env
-VITE_API_URL=http://localhost:5000/api/v1
-
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-```
+- **Queue instead of inline work:** PDF rendering and third-party email calls are slow and can fail. Moving them to BullMQ keeps API latency low and gives retries and backoff for free.
+- **Transaction for invoice numbers:** reserving the next invoice number and saving the invoice happen in one MongoDB transaction, so two simultaneous requests can never produce a duplicate number.
+- **Snapshots in invoices:** an invoice copies the business and customer details at creation time. Later edits to a profile do not rewrite history, which matters for accounting records.
+- **Repository layer:** database access lives in one place, which keeps services testable and makes the user-scoping rule easy to enforce.
+- **Redis for shared state:** rate limits, OTPs, and cached data live in Redis, so the API can run as several instances without losing consistency.
+- **Graceful shutdown:** on shutdown the server stops taking requests, lets workers finish, then closes Redis and MongoDB.
 
 ---
 
-# 🧠 Technical Design Decisions
+## 🗺️ Roadmap
 
-## Why Layered Architecture?
-
-The backend separates:
-
-```text
-Routes
-  ↓
-Controllers
-  ↓
-Services
-  ↓
-Repositories
-  ↓
-Database
-```
-
-This keeps HTTP handling, business logic, and database access separated.
+- [ ] Automated tests (Jest and Supertest) wired into the CI pipeline
+- [ ] Routes for polling PDF and email job status (the controllers already exist)
+- [ ] Bull Board dashboard for monitoring queues and failed jobs
+- [ ] Single-node MongoDB replica set in Docker Compose for one-command local setup
+- [ ] Payment-link integration and recurring invoices
 
 ---
 
-## Why Redis?
+## 👨‍💻 Author
 
-Redis is used for caching frequently accessed information and supporting rate limiting.
+**Nikhil Singh**, Backend Engineer
 
-This reduces unnecessary database operations and provides a centralized mechanism for controlling repeated requests.
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/nikhil-singh-802594231/)
+[![Email](https://img.shields.io/badge/Email-D14836?style=flat&logo=gmail&logoColor=white)](mailto:nikhilsingh2764@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/nikhilsingh2764)
 
----
-
-## Why JWT?
-
-JWT provides token-based authentication for protected REST API endpoints.
-
-Using separate access and refresh tokens allows short-lived access credentials while maintaining a mechanism for obtaining a new access token.
-
----
-
-## Why HTTP-only Cookies?
-
-HTTP-only cookies prevent JavaScript from directly accessing authentication cookies, reducing exposure to token theft through client-side scripts.
-
----
-
-## Why MongoDB?
-
-MongoDB provides a document-oriented database suitable for the application's business, customer, product, invoice, and authentication data.
-
----
-
-## Why Service and Repository Layers?
-
-The service layer contains application/business logic while repositories handle database interaction.
-
-This separation makes the backend easier to organize, maintain, and extend.
-
----
-
-# 📈 Scalability Considerations
-
-The project already includes several foundations that support scaling:
-
-* Redis caching
-* Redis-backed rate limiting
-* Pagination
-* Layered backend architecture
-* Separate repository layer
-* Protected API routes
-* External email service
-* Environment-based configuration
-* Modular feature-based organization
-
-Future scaling can build on this architecture by introducing additional background processing, automated testing, containerization, and CI/CD.
-
----
-
-# 🔄 Complete Invoice Workflow
-
-```text
-User Login
-    │
-    ▼
-Authentication
-    │
-    ▼
-Business Profile
-    │
-    ├───────────────┐
-    ▼               ▼
-Customers        Products
-    │               │
-    └───────┬───────┘
-            ▼
-       Create Invoice
-            │
-            ▼
-    Select Customer
-            │
-            ▼
-     Select Products
-            │
-            ▼
-   Calculate Subtotal
-            │
-            ▼
-      Apply Tax
-            │
-            ▼
-    Apply Discount
-            │
-            ▼
-       Grand Total
-            │
-            ▼
-       Save Invoice
-            │
-       ┌────┴────┐
-       ▼         ▼
-   Generate     Email
-      PDF       Invoice
-       │
-       ▼
-    Download
-```
-
----
-
-# 🚀 Deployment
-
-## Frontend
-
-Deployed using Vercel:
-
-[InvoicePilot Frontend](https://invoicepilot-zeta.vercel.app?utm_source=chatgpt.com)
-
-## Backend
-
-Deployed using Render:
-
-[InvoicePilot Backend API](https://invoice-backend-drqr.onrender.com?utm_source=chatgpt.com)
-
-## Database
-
-The application supports MongoDB/MongoDB Atlas.
-
-## Cache
-
-The application supports Redis/Redis Cloud.
-
----
-
-# 🗺️ Future Improvements
-
-Potential future improvements include:
-
-* Automated backend test suite
-* Swagger/OpenAPI documentation
-* Background job processing for email/PDF operations
-* Docker containerization
-* CI/CD pipeline
-* Advanced dashboard analytics
-* Monitoring and alerting
-* Additional database optimization
-* Improved automated API testing
-
----
-
-# 🤝 Contributing
-
-For development contributions:
-
-```bash
-# Create a feature branch
-git checkout -b feature/your-feature-name
-
-# Make your changes
-
-# Commit
-git commit -m "feat: add new feature"
-
-# Push
-git push origin feature/your-feature-name
-```
-
-Then open a pull request.
-
----
-
-# 📄 License
-
-No license is currently specified for this repository.
-
-If you intend to allow others to use, modify, or distribute the project, add an appropriate open-source license to the repository.
-
----
-
-# 👨‍💻 Author
-
-**Nikhil Singh**
-
-Backend Developer | Node.js | Express.js | MongoDB | Redis
-
-### Project Repository
-
-[InvoicePilot GitHub Repository](https://github.com/nikhilsingh2764/invoice-Genrator?utm_source=chatgpt.com)
-
-### Live Application
-
-[InvoicePilot](https://invoicepilot-zeta.vercel.app?utm_source=chatgpt.com)
-
-### API
-
-[InvoicePilot API](https://invoice-backend-drqr.onrender.com?utm_source=chatgpt.com)
-
-### Postman
-
-[Invoice Generator API Collection](https://www.postman.com/technical-physicist-35686083-s-team/workspace/invoice-generator-api/collection/39798617-83cff721-5ce7-4e00-ba58-0d49017d3f39?action=share&creator=39798617&utm_source=chatgpt.com)
+If you found this project useful, consider giving it a ⭐
