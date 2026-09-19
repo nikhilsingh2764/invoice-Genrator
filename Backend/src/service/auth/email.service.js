@@ -11,6 +11,12 @@ const sendEmail = async ({
     language = "en"
 }) => {
 
+
+ console.log("🔥 sendEmail CALLED");
+    console.log("To:", to);
+    console.log("Brevo key exists:", !!process.env.BREVO_API_KEY);
+
+
     try {
 
         const emailData = {

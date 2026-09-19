@@ -44,7 +44,7 @@ const invoiceEmailWorker = new Worker("invoice-email", async (job) => {
     // 3. Send email with PDF
     await sendEmail({
 
-        to: invoice.clientEmail,
+        to: invoice.customer.email,
 
         subject: `Invoice ${invoice.invoiceNumber}`,
 

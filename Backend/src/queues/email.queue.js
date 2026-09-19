@@ -1,8 +1,12 @@
+
+import "dotenv/config";
 import { Queue } from "bullmq";
 
 import redis from "../config/redis.js";
 
-export const emailQueue = new Queue("email", {
+console.log("queue-is ready");
+
+export const emailQueue = new Queue("send-email", {
     connection: redis,
 
     defaultJobOptions: {

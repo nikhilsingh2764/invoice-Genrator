@@ -64,7 +64,7 @@ export const getCustomerByIdService = async (
 ) => {
 
     const customer =
-        await customerRepository.findById(
+        await customerRepository.findByIdAndUserId(
             customerId,
             userId
         );

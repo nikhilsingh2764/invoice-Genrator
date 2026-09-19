@@ -1,3 +1,4 @@
+
 import bcrypt from "bcrypt";
 import generateOTP from "../../utils/generateOTP.js";
 
@@ -15,13 +16,7 @@ import translate from "../../utils/translate.js";
 const SALT_ROUNDS = 10;
 
 
-const sendOTPService = async ({
-    username = null,
-    email,
-    password = null,
-    type,
-    language = "en"
-}) => {
+const sendOTPService = async ({ username = null, email, password = null, type, language = "en" }) => {
 
     // Hash password
     let hashedPassword = null;
@@ -39,7 +34,10 @@ const sendOTPService = async ({
     const otp = generateOTP();
 
     // NEVER log OTP
-    // console.log(otp);
+    console.log("otp is:-",otp);
+
+    console.log("otp service");
+
 
 
     // Store OTP in Redis with expiry
@@ -95,15 +93,23 @@ const sendOTPService = async ({
 
 
     // Add email job to BullMQ
-    await emailQueue.add(
-        "send-email",
-        {
-            to: email,
-            subject,
-            html,
-            language
-        }
-    );
+
+        const job = await emailQueue.add(
+            "send-email",
+            {
+                to: email,
+                subject,
+                html,
+                language
+            },
+            {
+                // Optional: Ensure job ID is unique or trackable
+                removeOnComplete: true,
+                removeOnFail: false
+            }
+        );
+
+
 
 
     logger.info(

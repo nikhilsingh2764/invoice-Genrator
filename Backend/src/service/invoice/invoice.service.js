@@ -93,7 +93,7 @@ export const createInvoiceService = async (
             totalTax,
             totalDiscount,
             grandTotal
-        } = await buildInvoiceItems(items);
+        } = await buildInvoiceItems(items, userId);
 
 
         const invoiceNumber =
@@ -294,7 +294,8 @@ export const updateInvoiceService = async (
             totalDiscount,
             grandTotal
         } = await buildInvoiceItems(
-            updatedData.items
+            updatedData.items,
+            userId
         );
 
         updatedData.items = invoiceItems;

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Queue } from "bullmq";
 import redis from "../config/redis.js";
 
