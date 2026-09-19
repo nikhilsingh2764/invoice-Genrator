@@ -134,6 +134,79 @@ All queues use 3 attempts with exponential backoff (5 s base delay) and keep the
 
 ---
 
+## 🗺️ Route Flow (all endpoints)
+
+A single end-to-end journey through every route, in the order a real client actually calls them — sign up, verify, log in, set up the business, create an invoice, and get it to the customer. Every step also carries its rate limiter and, where it matters, its Redis/BullMQ behavior, so you can narrate `signup → verify-otp → login` or `create invoice → pdf → email` straight off this diagram.
+
+```mermaid
+flowchart TD
+    Start(["📱 Client"]) --> Signup["POST /signup<br/>signupLimiter"]
+    Signup --> SignupSvc["Hash password · create unverified user<br/>generate 6-digit OTP → Redis, 5 min TTL<br/>enqueue OTP email job"]
+    SignupSvc --> OTPSent(["201 OTP sent"])
+
+    OTPSent --> Verify["POST /verify-otp<br/>verifyOtpLimiter"]
+    Verify --> VerifyCheck{"OTP matches<br/>and not expired?"}
+    VerifyCheck -->|No| VerifyFail(["400 Invalid/expired OTP"])
+    VerifyFail --> Verify
+    VerifyCheck -->|Yes| VerifySvc["Mark user verified<br/>enqueue welcome email job"]
+    VerifySvc --> SignupDone(["201 Signup complete"])
+
+    SignupDone --> Login["POST /login<br/>loginLimiter"]
+    Login --> LoginCheck{"Verified, active,<br/>password correct?"}
+    LoginCheck -->|No, 5th fail| Lockout(["403 Account locked 15 min"])
+    LoginCheck -->|No| LoginFail(["401 Invalid credentials"])
+    LoginFail --> Login
+    LoginCheck -->|Yes| Tokens["Issue access token 15m<br/>+ rotating refresh token 15d<br/>→ HttpOnly Secure cookies"]
+    GoogleLogin["POST /google<br/>Verify Google ID token"] --> Tokens
+    Tokens --> LoggedIn(["200 Logged in"])
+
+    LoggedIn --> Refresh["POST /refresh-token<br/>refreshTokenLimiter<br/>rotates refresh cookie on every call"]
+    LoggedIn --> Profile["GET /profile · PATCH /update-profile<br/>PATCH /change-password<br/>🔒 authMiddleware"]
+    LoggedIn --> Forgot["POST /forgot-password → OTP email<br/>POST /reset-password → verify OTP, set password"]
+
+    LoggedIn --> BizSetup["POST · GET · PATCH · DELETE /business<br/>businessLimiter · 🔒 authMiddleware<br/>cached in Redis 10 min"]
+    BizSetup --> Setup["POST · GET · PATCH · DELETE /customer<br/>POST · GET · PATCH · DELETE /product<br/>CustomerLimiter / ProductLimiter · 🔒 authMiddleware"]
+
+    Setup --> CreateInvoice["POST /invoice<br/>invoiceCreateLimiter · 🔒 authMiddleware"]
+    CreateInvoice --> Transaction["MongoDB transaction:<br/>reserve next invoice number<br/>snapshot business + customer<br/>calculate tax/discount per line"]
+    Transaction --> InvoiceCreated(["201 Invoice created"])
+
+    InvoiceCreated --> ManageInvoice["GET /invoice/:id (cached 10 min)<br/>PATCH /invoice/:id → recalculate totals<br/>DELETE /invoice/:id<br/>POST /invoice/:id/duplicate"]
+
+    InvoiceCreated --> PDF["GET /invoice/:id/pdf"]
+    PDF --> PDFCache{"Cached in Redis?<br/>invoice:pdf:{userId}:{id}"}
+    PDFCache -->|Hit, 1h TTL| PDFStream(["200 PDF stream"])
+    PDFCache -->|Miss| PDFQueue["Enqueue invoice-pdf job → 202 + jobId"]
+    PDFQueue -.-> PDFWorker["Worker: PDFKit renders PDF<br/>→ caches in Redis"]
+    PDFWorker -.-> PDFStream
+
+    InvoiceCreated --> Email["POST /invoice/:id/email<br/>invoiceEmailLimiter"]
+    Email --> EmailQueue["Enqueue invoice-email job → 202 + jobId"]
+    EmailQueue -.-> EmailWorker["Worker: render PDF (PDFKit)<br/>→ send via Brevo with attachment<br/>3 retries, exponential backoff"]
+    EmailWorker -.-> Delivered(["Customer receives invoice email"])
+
+    LoggedIn --> Dashboard["GET /dashboard?search&status&sort&page&limit<br/>🔒 authMiddleware"]
+    Dashboard --> DashSvc["Aggregation pipelines:<br/>stats, revenue chart, status chart,<br/>top customers, top products, recent invoices"]
+    DashSvc --> DashCached(["200 Dashboard payload<br/>cached in Redis 10 min"])
+
+    LoggedIn --> Logout["POST /logout<br/>revokes refresh token, clears cookies"]
+
+    Start -.->|monitoring| Ops["GET /health · /health/live · /health/ready · /metrics<br/>no auth required"]
+
+    classDef terminal fill:#000000,stroke:#333,color:#fff
+    classDef decision fill:#DC382D,stroke:#333,color:#fff
+    class OTPSent,SignupDone,LoggedIn,InvoiceCreated,PDFStream,Delivered,DashCached,Lockout terminal
+    class VerifyCheck,LoginCheck,PDFCache decision
+```
+
+**How to read it for an interview walkthrough:**
+- Follow the top path for the auth lifecycle: `signup → verify-otp → login → refresh-token`. OTPs live in Redis with a 5-minute TTL, tokens live in HttpOnly cookies, and refresh tokens rotate on every use.
+- Follow the middle path for the core product loop: business/customer/product setup → `create invoice` (inside a MongoDB transaction) → `pdf`/`email`, where both return `202` immediately and hand off to a BullMQ worker.
+- The branch diamonds (`OTP valid?`, `login valid?`, `PDF cached?`) are the actual conditional logic in the services — useful for explaining retries, lockouts, and cache hit/miss behavior.
+- Every write route still carries its own Redis-backed rate limiter (named on the node), so limits hold even if the API scales to multiple instances.
+
+---
+
 ## 🛠️ Tech Stack
 
 | Category | Technologies |
