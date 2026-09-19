@@ -25,6 +25,9 @@ const SALT_ROUNDS = 10;
 
 export const SignupService = async (userdata, language = "en") => {
 
+    console.log("start email seininf");
+    
+
     let { username, email, password } = userdata;
 
     // Sanitize data
@@ -53,14 +56,21 @@ export const SignupService = async (userdata, language = "en") => {
         );
     }
 
+    console.log("email");
+
+
 
     // Generate OTP, save signup data and queue email
+    console.log("🔥 1 - BEFORE sendOTPService");
+
     await sendOTPService({
         username,
         email,
         password,
         type: "EMAIL_VERIFICATION"
     });
+
+    console.log("🔥 2 - AFTER sendOTPService");
 
 
     logger.info(

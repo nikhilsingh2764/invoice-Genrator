@@ -30,6 +30,11 @@ import swaggerSpec from "./config/swagger.js";
 
 const app = express();
 
+app.use((req, res, next) => {
+    console.log("🔥 REQUEST ENTERED APP");
+    next();
+});
+
 
 
 //app.use()   //express method used to register/add middleware runs for every incoming requests.
@@ -92,14 +97,23 @@ app.use("/api/v1", healthRouter);
 app.use("/api/v1", metricsRouter);
 
 
-// Global Error Handler (ALWAYS LAST)
-app.use(errorMiddleware);
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "API is healthy"
+    });
+});
+
+
 
 app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec)
 );
+
+// Global Error Handler (ALWAYS LAST)
+app.use(errorMiddleware);
 
 
 

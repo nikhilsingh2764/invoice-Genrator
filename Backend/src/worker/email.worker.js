@@ -1,17 +1,22 @@
-import logger from "../utils/logger.js"
+import "dotenv/config";
 
+
+import logger from "../utils/logger.js";
 import { Worker } from "bullmq";
-
 import sendEmail from "../service/auth/email.service.js";
-
 import redis from "../config/redis.js";
 
-const emailWorker = new Worker("email", async (job) => {
+
+const emailWorker = new Worker("send-email", async (job) => {
+
+    console.log("🔥 JOB RECEIVED:", job.id);
+    console.log("🔥 JOB DATA:", job.data);
 
     const {
         to,
         subject,
-        html
+        html,
+        language = "en"
     } = job.data;
 
 
@@ -22,7 +27,8 @@ const emailWorker = new Worker("email", async (job) => {
     await sendEmail({
         to,
         subject,
-        html
+        html,
+        language
     });
 
 
@@ -54,12 +60,45 @@ emailWorker.on("completed", (job) => {
 emailWorker.on("failed", (job, error) => {
 
     logger.error({
-        message: "Invoice email job failed",
+        message: "Email job failed",
         jobId: job?.id,
         error: error.message,
         stack: error.stack
     });
 
 });
+
+
+// Worker error
+emailWorker.on("error", (error) => {
+
+    logger.error({
+        message: "Email worker error",
+        error: error.message,
+        stack: error.stack
+    });
+
+});
+
+
+// Graceful shutdown
+const shutdown = async () => {
+
+    logger.info("Shutting down email worker...");
+
+    await emailWorker.close();
+
+    logger.info("Email worker stopped");
+
+    process.exit(0);
+};
+
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
+
+
+logger.info("Email worker started");
+
 
 export default emailWorker;

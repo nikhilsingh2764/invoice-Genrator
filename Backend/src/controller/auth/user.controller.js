@@ -26,8 +26,10 @@ import {
 
 export const Signup = TryCatch(async (req, res) => {
 
-    const data =
-        await SignupService(
+    console.log("🚨 CONTROLLER VERSION 123");
+
+        
+    const data = await SignupService(
             req.body,
             req.language
         );

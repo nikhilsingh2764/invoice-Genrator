@@ -1,7 +1,7 @@
 import ApiError from "../utils/ApiError.js";
 import productRepository from "../repository/invoice/product.repository.js";
 
-export const buildInvoiceItems = async (items) => {
+export const buildInvoiceItems = async (items, userId) => {
 
     if (!items || items.length === 0) {
         throw new ApiError(400, "Invoice must contain at least one product");
@@ -15,7 +15,7 @@ export const buildInvoiceItems = async (items) => {
 
     for (const item of items) {
 
-        const product = await productRepository.findById(item.productId);
+        const product = await productRepository.findByIdAndUserId(item.productId, userId);
 
         if (!product) {
             throw new ApiError(404, `Product not found: ${item.productId}`);

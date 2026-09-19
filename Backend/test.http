@@ -1,29 +1,28 @@
-
-
 ### Signup - Send OTP
 
 POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/signup
 Content-Type: application/json
 
 {
-    "username": "nikhilputsdss",
-    "email": "nikhilsingh11346@gmail.com",
+    "username": "viksass",
+    "email": "nikhilsinghdfg@gmail.com",
     "password": "dhn245dfgAA@"
 }
 
 
 
-###
+### Health Check
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/health
 
 
 ### Verify OTP
 
-POST http://localhost:8000/api/v1/verify-otp
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/verify-otp
 Content-Type: application/json
 
 {
-    "email": "nikhilsinghd276@gmail.com",
-    "otp": "626127"
+    "email": "nikhilsinghdfg@gmail.com",
+    "otp": " 367045"
 
 }
 
@@ -31,43 +30,41 @@ Content-Type: application/json
 
 ### login test 
 
-POST http://localhost:8000/api/v1/Login
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/Login
 Content-Type: application/json
 
 {
-    "email": "dsss@gmail.com",
-    "password": "dhn245dfgA@"
+    "email": "nikhilsinghdfg@gmail.com",
+    "password": "dhn245dfgAA@"
 }
 
 ###
 
 ### Get Profile 
 
-GET http://localhost:8000/api/v1/profile 
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzg4MiwiZXhwIjoxNzg1MjcwODgyfQ.SoQMsOWcSbztYzg-FOpLkRvaKIb3Vigp_xyhc6XQb-U
+GET  https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/profile 
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk3MzI3LCJleHAiOjE3ODk4MDAzMjd9.YKKjUdIFYc3RKFqUAZsuc4zhi9BVmdLO7sXS6vzGkRc
 
-
-###
 
 ### Refresh Access Token
 
-POST http://localhost:8000/api/v1/refresh-token
-Cookie: refreshToken =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImlhdCI6MTc4NTI2Nzc5MCwiZXhwIjoxNzg2NTYzNzkwfQ.Vqhx80OOXc7yBV4FZrqGcRENKR8BN0s3FGReDSMfJfc
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/refresh-token
+Cookie: refreshToken =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImlhdCI6MTc4OTc5NzI3NiwiZXhwIjoxNzkxMDkzMjc2fQ.QMsjZpM1G99iL_hhZt3SgjfSIaOws_MNYEDz8w-Z--8; Max-Age=1296000
 
  
 
 
 ### Logout 
-POST http://localhost:8000/api/v1/logout 
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNTJiZDk3YWIzNzJjZDllMDRhYSIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg1MjY3NTIzLCJleHAiOjE3ODUyNzA1MjN9.VQHQn4ZJ2NT4FSxrUHRs4pjJkVWBQPPZV51FMat4uP4
 
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/logout 
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImlhdCI6MTc4OTc5NzI3NiwiZXhwIjoxNzkxMDkzMjc2fQ.QMsjZpM1G99iL_hhZt3SgjfSIaOws_MNYEDz8w-Z--8; Max-Age=1296000
 
 
 ### Update Profile
 
-PATCH http://localhost:8000/api/v1/Update-Profile
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/update-profile
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNDBjODYzYzQzNmQyNDdlOThiNSIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg1MjY3MjE5LCJleHAiOjE3ODUyNzAyMTl9.x27l1O_KeenS76vmGKh3hfFAkxfVzdgPHN0bjQJiNXo
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUwZDI4ZTdkYzY4YjEwNmFlNzc4OCIsImVtYWlsIjoibmlraGlsc2luZ2gzMzQ0NTVAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkxODMzLCJleHAiOjE3ODk3OTQ4MzN9.fpYMUBCCTGooN-Psza5YSUr2sopJIc7EWClqFRmbac0
 
 {
     "username": "vimal"
@@ -76,9 +73,9 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNDBjODY
 
 ### Change Password
 
-PATCH http://localhost:8000/api/v1/change-password
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/change-password
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNDBjODYzYzQzNmQyNDdlOThiNSIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg1MjY3MjE5LCJleHAiOjE3ODUyNzAyMTl9.x27l1O_KeenS76vmGKh3hfFAkxfVzdgPHN0bjQJiNXo
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUwZDI4ZTdkYzY4YjEwNmFlNzc4OCIsImVtYWlsIjoibmlraGlsc2luZ2gzMzQ0NTVAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkxODMzLCJleHAiOjE3ODk3OTQ4MzN9.fpYMUBCCTGooN-Psza5YSUr2sopJIc7EWClqFRmbac0
 
 {
     "oldPassword": "dhn245dfgAA@",
@@ -88,16 +85,16 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNDBjODY
 
 ### Deactivate Account
 
-PATCH http://localhost:8000/api/v1/deactivate-account
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNTJiZDk3YWIzNzJjZDllMDRhYSIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg1MjY3NTQ5LCJleHAiOjE3ODUyNzA1NDl9.b7F37CGaxHn821ml_tH2EKzSlM1gdblYaHCtoznasYg
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/deactivate-account
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUwZDI4ZTdkYzY4YjEwNmFlNzc4OCIsImVtYWlsIjoibmlraGlsc2luZ2gzMzQ0NTVAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkxODMzLCJleHAiOjE3ODk3OTQ4MzN9.fpYMUBCCTGooN-Psza5YSUr2sopJIc7EWClqFRmbac0
 
 
 
 ### Delete Account
 
-DELETE http://localhost:8000/api/v1/delete-account
+DELETE https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/delete-account
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNWZmYmZiMjM5Njg3M2VhNjc1MyIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2NzczMCwiZXhwIjoxNzg1MjcwNzMwfQ.mO_CnSd7G5_iIPnJaoF70LQj73qIcnQWCoNnsATRkGo
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMGI1ZTdkYzY4YjEwNmFlNzc4YiIsImVtYWlsIjoibmlraGlsc2luZ2gzMzRAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyNTQ3LCJleHAiOjE3ODk3OTU1NDd9.kXabo2ik8ScZotoD6-mlhvz3bM7G_WsO0RThVDZ4H5A
 
 {
     "password": "dhn245dfgAA@"
@@ -107,7 +104,7 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNWZmYmZ
 
 ### Forgot Password
 
-POST http://localhost:8000/api/v1/forgot-password
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/forgot-password
 Content-Type: application/json
 
 {
@@ -117,14 +114,14 @@ Content-Type: application/json
 
 ### Reset Password
 
-POST http://localhost:8000/api/v1/reset-password
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/reset-password
 Content-Type: application/json
 
 {
     "email": "nikhilsinghdfg@gmail.com",
-    "otp": "531006",
-    "newPassword": "dhn245dfgA@123",
-    "confirmPassword": "dhn245dfgA@123"
+    "otp": "195754",
+    "newPassword": "dhn245dfgA@qaz",
+    "confirmPassword": "dhn245dfgA@qaz"
 }
 
 
@@ -135,10 +132,9 @@ Content-Type: application/json
 ### create new business
 
 
-POST http://localhost:8000/api/v1/business
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/business
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzk1MiwiZXhwIjoxNzg1MjcwOTUyfQ.JnyUuCjFWwVioKbLLcGanJ7y72cP2xishW2uHFYI1AU
-
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk3MzI3LCJleHAiOjE3ODk4MDAzMjd9.YKKjUdIFYc3RKFqUAZsuc4zhi9BVmdLO7sXS6vzGkRc
 
 {
   "businessName": "Nextpen Solutions pvt lmt",
@@ -165,24 +161,24 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZ
 
 ### get business profile
 
-GET http://localhost:8000/api/v1/business
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/business
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzk1MiwiZXhwIjoxNzg1MjcwOTUyfQ.JnyUuCjFWwVioKbLLcGanJ7y72cP2xishW2uHFYI1AU
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 
 ### delete business profile
 
-DELETE  http://localhost:8000/api/v1/business
+DELETE  https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/business
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzk1MiwiZXhwIjoxNzg1MjcwOTUyfQ.JnyUuCjFWwVioKbLLcGanJ7y72cP2xishW2uHFYI1AU
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 ### Update Business
 
-PATCH http://localhost:8000/api/v1/business
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/business
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzk1MiwiZXhwIjoxNzg1MjcwOTUyfQ.JnyUuCjFWwVioKbLLcGanJ7y72cP2xishW2uHFYI1AU
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 {
   "businessName": "Nextpen pvt lmt",
@@ -198,16 +194,16 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZ
 ### create new product
 
 
-POST http://localhost:8000/api/v1/product
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/product
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzk1MiwiZXhwIjoxNzg1MjcwOTUyfQ.JnyUuCjFWwVioKbLLcGanJ7y72cP2xishW2uHFYI1AU
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 {
     "productName": "Laptop",
-    "description": "HP 15S Laptop",
+    "description": "DEll 15S Laptop",
     "category": "Electronics",
     "unit": "piece",
-    "price": 5000,
+    "price": 6000,
     "taxRate": 12,
     "discount": 5
 }
@@ -216,21 +212,21 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZ
 
 ### Get All Products
 
-GET http://localhost:8000/api/v1/product
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2Nzk1MiwiZXhwIjoxNzg1MjcwOTUyfQ.JnyUuCjFWwVioKbLLcGanJ7y72cP2xishW2uHFYI1AU
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/product
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 ### Get Product By ID
 
-GET http://localhost:8000/api/v1/product/6a69076264a41a108c46d72c
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/product/6aae1373e7dc68b106ae7792
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 ### Update Product
 
-PATCH http://localhost:8000/api/v1/product/6a69076264a41a108c46d72c
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/product/6aae1373e7dc68b106ae7792
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 {
@@ -245,8 +241,8 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 ### Delete Product
 
-DELETE http://localhost:8000/api/v1/product/6a69076264a41a108c46d72c
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+DELETE https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/product/6aae1373e7dc68b106ae7792
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 
@@ -255,14 +251,14 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 ### Create Customer
 
-POST http://localhost:8000/api/v1/customer
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/customer
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 {
-    "customerName": "liya naveed",
-    "email": "nikhilsinghdfg@gmail.com",
+    "customerName": "raj",
+    "email": "nikhilsingh2764@gmail.com",
     "phone": "8407937952",
     "companyName": "TechNova Solutions",
     "gstNumber": "27ABCDE1234F1Z5",
@@ -290,21 +286,25 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 ### Get All Customers
 
-GET http://localhost:8000/api/v1/customer
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/customer
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk3MzI3LCJleHAiOjE3ODk4MDAzMjd9.YKKjUdIFYc3RKFqUAZsuc4zhi9BVmdLO7sXS6vzGkRc
 
 
 ### Get Customer By ID
 
-GET http://localhost:8000/api/v1/customer/6a6907f164a41a108c46d72f
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/customer/6aae1480e7dc68b106ae7796
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
+
+
+
+
 
 
 ### Update Customer
 
-PATCH http://localhost:8000/api/v1/customer/6a6907f164a41a108c46d72f
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/customer/6aae1480e7dc68b106ae7796
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 {
     "customerName": "Priya Verma Updated",
@@ -328,8 +328,8 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 ### Delete Customer
 
-DELETE http://localhost:8000/api/v1/customer/6a6907f164a41a108c46d72f
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+DELETE https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/customer/6aae1480e7dc68b106ae7796
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxMWU0ZTdkYzY4YjEwNmFlNzc4ZCIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5NzkyOTc5LCJleHAiOjE3ODk3OTU5Nzl9.3Wvt-JHLhJrChL0k7mVma-rX_f_FP8BMpVO1G6O5_L0
 
 
 
@@ -339,29 +339,28 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 
 ### Create Invoice
 
-POST http://localhost:8000/api/v1/invoice
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
-
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 {
-  "customerId": "6a69080a64a41a108c46d730",
+  "customerId": "6aae2caca8ade6dc874494e9",
   "items": [
     {
-      "productId": "6a6907cd64a41a108c46d72d",
-      "quantity": 2
+      "productId": "6aae2cc5a8ade6dc874494ea",
+      "quantity": 4
     }
   ],
 "dueDate": "2026-02-01",
   "status": "Pending",
-  "notes": "Invoice 8"
+  "notes": "Invoice 9"
 }
 
 
 ### Get Invoice By ID
 
-GET http://localhost:8000/api/v1/invoice/6a69093564a41a108c46d733
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice/6aae247bc6c943cc8ad728a6
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk3MzI3LCJleHAiOjE3ODk4MDAzMjd9.YKKjUdIFYc3RKFqUAZsuc4zhi9BVmdLO7sXS6vzGkRc
 
 
 
@@ -370,20 +369,20 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 ### Update Invoice
 
 
-PATCH http://localhost:8000/api/v1/invoice/6a69093564a41a108c46d733
+PATCH https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice/6aae247bc6c943cc8ad728a6
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk3MzI3LCJleHAiOjE3ODk4MDAzMjd9.YKKjUdIFYc3RKFqUAZsuc4zhi9BVmdLO7sXS6vzGkRc
 
 {
-  "customerId": "6a69080a64a41a108c46d730",
+  "customerId": "6aae2426c6c943cc8ad728a4",
   "items": [
     {
-      "productId": "6a6907cd64a41a108c46d72d",
+      "productId": "6aae241cc6c943cc8ad728a3",
       "quantity": 3
     }
   ],
   "dueDate": "2026-08-10",
-  "status": "Pending",
+  "status": "Paid",
   "notes": "Updated invoice after customer request"
 }
 
@@ -393,84 +392,92 @@ Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2OD
 ### delete Invoice
 
 
-DELETE  http://localhost:8000/api/v1/invoice/6a69093564a41a108c46d733
+DELETE  https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice/6aae247bc6c943cc8ad728a6
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
-
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk3MzI3LCJleHAiOjE3ODk4MDAzMjd9.YKKjUdIFYc3RKFqUAZsuc4zhi9BVmdLO7sXS6vzGkRc
 
 
 
 ### Send Invoice Email
-POST http://localhost:8000/api/v1/invoice/6a6909c864a41a108c46d734/email
+
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice/6aae2988a8ade6dc874494e7/email
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2ODczOSwiZXhwIjoxNzg1MjcxNzM5fQ.VY6cTTTZz-YaY8NeHFekYZ_MV2Kzzf2cDxD-2xpLlM0
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
+
+
+
+
 
 ### Download Invoice PDF
 
-GET http://localhost:8000/api/v1/invoice/6a6909c864a41a108c46d734/pdf
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjkwNjQ2YmZiMjM5Njg3M2VhNjc1NiIsImVtYWlsIjoibmlraGlsc2luZ2hkMjc2QGdtYWlsLmNvbSIsImlhdCI6MTc4NTI2ODczOSwiZXhwIjoxNzg1MjcxNzM5fQ.VY6cTTTZz-YaY8NeHFekYZ_MV2Kzzf2cDxD-2xpLlM0
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice/6aae2988a8ade6dc874494e7/pdf
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 ### Duplicate Invoice
-POST http://localhost:8000/api/v1/invoice/6a6909c864a41a108c46d734/duplicate
+
+POST https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/invoice/6aae2988a8ade6dc874494e7/duplicate
 Content-Type: application/json
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-################################################################################################
+
+
+###################################################################################################################
 
 ### Dashboard Stats
 
-GET http://localhost:8000/api/v1/
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 ### Dashboard Search Test
 
-GET http://localhost:8000/api/v1/?search=rahul
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?search=raj
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 ### Dashboard Filter By Status - Paid
 
-GET http://localhost:8000/api/v1/?status=Paid
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQxk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?status=Paid
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 
 ### Dashboard Filter By Status - Pending
 
-GET http://localhost:8000/api/v1/?status=Pending
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?status=Pending
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 ### Dashboard Sort Latest Invoice First
 
-GET http://localhost:8000/api/v1/?sort=-createdAt
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQXk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?sort=-createdAt
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 
 ### Dashboard Sort Oldest Invoice First
 
-GET http://localhost:8000/api/v1/?sort=createdAt
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQxk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
+
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?sort=createdAt
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
+
 
 ### Dashboard Pagination Page 1 Limit 5
 
-GET http://localhost:8000/api/v1/?page=1&limit=5
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQxk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
 
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?page=1&limit=5
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 
 ### Dashboard Combined Test
 ### Search + Filter + Sort + Pagination
 
-GET http://localhost:8000/api/v1/?search=tech&status=Paid&sort=-createdAt&page=1&limit=10
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWM4NmY2ODRkMDZjMmQ0MThkY2U1YiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg0NTMwNzMxLCJleHAiOjE3ODQ1MzE2MzF9.vMCQxk6_TeFVTMtnXS7fEJiVEftbiXHlwMys49y3uyQ
 
+GET https://special-rotary-phone-5g49xvj57j49344gq-8000.app.github.dev/api/v1/dashboard/?search=tech&status=Paid&sort=-createdAt&page=1&limit=10
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWUxYWI0NGU1ZjBkN2ExMDBiNWYzNiIsImVtYWlsIjoibmlraGlsc2luZ2hkZmdAZ21haWwuY29tIiwiaWF0IjoxNzg5Nzk4MzgwLCJleHAiOjE3ODk4MDEzODB9.0f49VLKQMn7EKYE1SmJR_KCqqWDp2JzcBtBiClZoGXE
 
 
 
